@@ -2,13 +2,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context="layout.NavigationDrawerFragment">
-    <ImageView
-        android:layout_width="280dp"
-        android:layout_height="140dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_abstract"/>
+    android:background="@android:color/white"
+    tools:context="planner.budget.budgetplanner.NavigationDrawerFragment">
+
+    <LinearLayout
+        android:id="@+id/containerDrawerImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FB8C00">
+
+        <ImageView
+            android:layout_marginTop="@dimen/drawer_margin_top"
+            android:id="@+id/nav_icon_img"
+            android:layout_width="280dp"
+            android:layout_height="140dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_abstract"/>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/drawer_list"
+        android:layout_marginTop="195dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
 
     <!-- TODO: Update blank fragment layout -->
 
