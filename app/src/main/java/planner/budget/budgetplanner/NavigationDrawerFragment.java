@@ -1,4 +1,4 @@
-package layout;
+package planner.budget.budgetplanner;
 
 
 import android.content.Context;
@@ -10,13 +10,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
+import planner.budget.budgetplanner.InformationDrawer;
+import planner.budget.budgetplanner.InformationDrawerAdapter;
 import planner.budget.budgetplanner.R;
 
 /**
@@ -24,11 +30,12 @@ import planner.budget.budgetplanner.R;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+    private RecyclerView recyclerView;
     public static final String PREF_FILE_NAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-
+    private InformationDrawerAdapter adapter;
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
     private View containerView;
@@ -49,7 +56,25 @@ public class NavigationDrawerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        View layout= inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        recyclerView= (RecyclerView) layout.findViewById(R.id.drawer_list);
+        adapter=new InformationDrawerAdapter(getActivity(), getData());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return layout;
+    }
+
+    public static List<InformationDrawer> getData(){
+        List<InformationDrawer> data=new ArrayList<>();
+        int[] icons={R.drawable.ic_drawer_cash, R.drawable.ic_bills, R.drawable.ic_spend_summary};
+        String[] titles={"Cash","Bills","Spend Summary"};
+        for (int i=0;i<titles.length && i<icons.length;i++){
+            InformationDrawer current=new InformationDrawer();
+            current.iconId=icons[i];
+            current.title=titles[i];
+            data.add(current);
+        }
+        return data;
     }
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
