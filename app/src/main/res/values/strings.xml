@@ -9,7 +9,12 @@
     <string name="title_activity_homepage">homepage</string>
     <string name="bar_graph_top">Bar Graph</string>
     <string name="pie_chart_2top">Pie chart</string>
-    <string name="prediction2">Prediction2</string>
-    <string name="prediction1">Prediction1</string>
+    <string name="Budget_label">Budget</string>
+    <string name="prediction">Predicted Expenses</string>
     <string name="homepage_button">Homepage</string>
+    <string name="spend_Label">Spend</string>
+    <string name="top_spend_label">Top Spend</string>
+    <string name="Budgetamt">5500 Rs.</string>
+    <string name="_5500_rs">5500 Rs.</string>
+    <string name="edit_label">Edit</string>
 </resources>
