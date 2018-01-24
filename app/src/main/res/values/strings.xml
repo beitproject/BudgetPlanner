@@ -17,4 +17,9 @@
     <string name="Budgetamt">5500 Rs.</string>
     <string name="_5500_rs">5500 Rs.</string>
     <string name="edit_label">Edit</string>
+    <string name="bill_title">Bills Data</string>
+    <string name="cash_title">Cash Data</string>
+    <string name="manifest_spendlabel">Spend Summary</string>
+    <string name="manifest_billslabel">Bills</string>
+    <string name="manifest_cashlabel">Cash</string>
 </resources>
