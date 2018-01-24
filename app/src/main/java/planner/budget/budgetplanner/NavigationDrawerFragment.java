@@ -2,6 +2,7 @@ package planner.budget.budgetplanner;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -13,7 +14,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,7 +31,7 @@ import planner.budget.budgetplanner.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment extends Fragment implements InformationDrawerAdapter.ClickListener {
 
     private RecyclerView recyclerView;
     public static final String PREF_FILE_NAME="testpref";
@@ -59,6 +62,7 @@ public class NavigationDrawerFragment extends Fragment {
         View layout= inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         recyclerView= (RecyclerView) layout.findViewById(R.id.drawer_list);
         adapter=new InformationDrawerAdapter(getActivity(), getData());
+        adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return layout;
@@ -120,5 +124,17 @@ public class NavigationDrawerFragment extends Fragment {
     public static String readFromPreferences(Context context, String preferenceName, String defaultValue){
         SharedPreferences sharedPreferences=context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(preferenceName, defaultValue);
+    }
+
+    @Override
+    public void itemClicked(View view, int position) {
+        if (position==0){
+            startActivity(new Intent(getActivity(), NavDrawer_Cash.class));
+        }   else if(position==1){
+            startActivity(new Intent(getActivity(), NavDrawer_Bills.class));
+        }   else {
+            startActivity(new Intent(getActivity(), NavDrawer_SpendSummary.class));
+        }
+
     }
 }
