@@ -24,14 +24,30 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
-        <activity android:name=".NavDrawer_Bills"
+        <activity
+            android:name=".NavDrawer_Bills"
             android:label="@string/manifest_billslabel">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
+        <activity
+            android:name=".NavDrawer_SpendSummary"
+            android:label="@string/manifest_spendlabel">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
+        <activity
+            android:name=".AddExpense"
+            android:label="@string/addExpense_title">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity"/>
         </activity>
-        <activity android:name=".NavDrawer_SpendSummary"
-            android:label="@string/manifest_spendlabel">
+        <activity
+            android:name=".AddIncome"
+            android:label="@string/addIncome_title">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity"/>
