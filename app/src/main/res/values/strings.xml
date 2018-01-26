@@ -23,4 +23,6 @@
     <string name="manifest_billslabel">Bills</string>
     <string name="manifest_cashlabel">Cash</string>
     <string name="customrow_text">Cash</string>
+    <string name="addExpense_title">Add Expense</string>
+    <string name="addIncome_title">Add Income</string>
 </resources>

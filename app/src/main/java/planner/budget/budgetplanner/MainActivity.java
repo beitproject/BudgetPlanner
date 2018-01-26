@@ -1,12 +1,15 @@
 package planner.budget.budgetplanner;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     PieChart piechart;
+    private FloatingActionButton mFAB_item1;
+    private FloatingActionButton mFAB_item2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +37,36 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
+        //to implement toolbar and navigation drawer
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
 
+        //to implement onClickListener for AddIncome
+        mFAB_item1= (FloatingActionButton) findViewById(R.id.menu_item1);
+
+        mFAB_item1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent item1_intent=new Intent(MainActivity.this,AddIncome.class);
+                startActivity(item1_intent);
+            }
+        });
+
+        //to implement onClickListener for AddExpense
+        mFAB_item2= (FloatingActionButton) findViewById(R.id.menu_item2);
+
+        mFAB_item2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent item2_intent=new Intent(MainActivity.this,AddExpense.class);
+                startActivity(item2_intent);
+            }
+        });
+
+
+        //to implement bar graph and pie chart
         try {
 
             GraphView graph = (GraphView) findViewById(R.id.graph);
