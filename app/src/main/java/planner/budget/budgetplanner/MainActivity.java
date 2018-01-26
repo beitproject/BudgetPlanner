@@ -1,11 +1,14 @@
 package planner.budget.budgetplanner;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -67,9 +70,25 @@ public class MainActivity extends AppCompatActivity {
             PieData data = new PieData(dataSet);
             data.setValueTextColor(Color.RED);
             data.setValueTextSize(10f);
-
-
             piechart.setData(data);
+
+
+            CardView card2 = (CardView) findViewById(R.id.card2);
+            card2.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View view){
+                    Intent intent = new Intent(MainActivity.this, budget_page.class);
+                    startActivity(intent);
+                }
+            });
+
+            CardView card3 = (CardView) findViewById(R.id.card3);
+            card3.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View view){
+                    Intent intent = new Intent(MainActivity.this,Spend_page.class);
+                    startActivity(intent);
+                }
+            });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
