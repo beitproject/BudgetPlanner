@@ -22,6 +22,7 @@
     <string name="manifest_spendlabel">Spend Summary</string>
     <string name="manifest_billslabel">Bills</string>
     <string name="manifest_cashlabel">Cash</string>
+    <string name="customrow_text">Cash</string>
     <string name="spend_summary">Spend Summary</string>
     <string name="my_budget">Monthly Budget</string>
     <string name="rs">Rs.</string>
