@@ -38,6 +38,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
+        <activity
+            android:name=".AddExpense"
+            android:label="@string/addExpense_title">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".AddIncome"
+            android:label="@string/addIncome_title">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
         <activity android:name=".budget_page" />
         <activity android:name=".Spend_page" />
         <activity android:name=".top_spend"></activity>

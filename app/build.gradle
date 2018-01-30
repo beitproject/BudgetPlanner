@@ -47,6 +47,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.4.0'
     compile 'com.jjoe64:graphview:4.2.1'
     compile 'com.android.support:multidex:1.0.2'
+    compile 'com.github.clans:fab:1.6.4'
     testCompile 'junit:junit:4.12'
 
 }

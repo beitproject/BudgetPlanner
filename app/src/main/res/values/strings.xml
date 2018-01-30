@@ -32,4 +32,6 @@
     <string name="worry">worry</string>
     <string name="sad">sad</string>
     <string name="top_spend_areas">Top Spend Areas</string>
+    <string name="addExpense_title">Add Expense</string>
+    <string name="addIncome_title">Add Income</string>
 </resources>
