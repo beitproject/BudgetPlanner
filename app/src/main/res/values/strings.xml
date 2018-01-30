@@ -23,6 +23,15 @@
     <string name="manifest_billslabel">Bills</string>
     <string name="manifest_cashlabel">Cash</string>
     <string name="customrow_text">Cash</string>
+    <string name="spend_summary">Spend Summary</string>
+    <string name="my_budget">Monthly Budget</string>
+    <string name="rs">Rs.</string>
+    <string name="set_now">Set Now</string>
+    <string name="transactions">Transactions</string>
+    <string name="happy">happy</string>
+    <string name="worry">worry</string>
+    <string name="sad">sad</string>
+    <string name="top_spend_areas">Top Spend Areas</string>
     <string name="addExpense_title">Add Expense</string>
     <string name="addIncome_title">Add Income</string>
 </resources>
