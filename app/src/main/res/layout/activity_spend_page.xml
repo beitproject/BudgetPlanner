@@ -49,46 +49,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="88dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="16dp"
-        android:adjustViewBounds="false"
-        android:contentDescription="@string/happy"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar2"
-        app:layout_constraintEnd_toStartOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/s1" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="88dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/worry"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar2"
-        app:layout_constraintEnd_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/s2" />
-
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/sad"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/s3" />
 </android.support.constraint.ConstraintLayout>

@@ -88,6 +88,15 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            CardView card4 = (CardView) findViewById(R.id.card4);
+            card4.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View view){
+                    Intent intent = new Intent(MainActivity.this,top_spend.class);
+                    startActivity(intent);
+                }
+            });
+
+
 
         } catch (Exception e) {
             e.printStackTrace();

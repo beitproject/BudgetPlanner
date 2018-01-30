@@ -39,7 +39,8 @@
                 android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
         <activity android:name=".budget_page" />
-        <activity android:name=".Spend_page"></activity>
+        <activity android:name=".Spend_page" />
+        <activity android:name=".top_spend"></activity>
     </application>
 
 </manifest>
