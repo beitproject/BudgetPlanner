@@ -66,17 +66,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         //to implement bar graph and pie chart
         try {
 
             GraphView graph = (GraphView) findViewById(R.id.graph);
             BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[]{
-                    new DataPoint(0, -1),
-                    new DataPoint(1, 5),
-                    new DataPoint(2, 3),
-                    new DataPoint(3, 2),
-                    new DataPoint(4, 6)
+                    new DataPoint(0, 20),
+                    new DataPoint(1, 50),
+                    new DataPoint(2, 30),
+                    new DataPoint(3, 10),
+                    new DataPoint(4, 55)
             });
             graph.addSeries(series);
             piechart = (PieChart) findViewById(R.id.pie_chart);
