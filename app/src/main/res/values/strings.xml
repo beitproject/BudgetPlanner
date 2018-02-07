@@ -34,4 +34,8 @@
     <string name="top_spend_areas">Top Spend Areas</string>
     <string name="addExpense_title">Add Expense</string>
     <string name="addIncome_title">Add Income</string>
+    <string name="expense_hintamt">Enter Amount</string>
+    <string name="expense_hintspend">Description</string>
+    <string name="calendar_btntext">Select a Date</string>
+    <string name="expense_textview">Select a category</string>
 </resources>
