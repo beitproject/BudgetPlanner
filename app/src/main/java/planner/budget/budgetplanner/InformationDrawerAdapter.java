@@ -67,7 +67,7 @@ public class InformationDrawerAdapter extends RecyclerView.Adapter<InformationDr
 
         @Override
         public void onClick(View v) {
-            context.startActivity(new Intent(context, NavDrawer_Cash.class));
+            /*context.startActivity(new Intent(context, NavDrawer_Cash.class));*/
             if (clickListener!=null){
                 clickListener.itemClicked(v, getPosition());
             }

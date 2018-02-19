@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,13 +129,29 @@ public class NavigationDrawerFragment extends Fragment implements InformationDra
 
     @Override
     public void itemClicked(View view, int position) {
-        if (position==0){
+       /* if (position==0){
             startActivity(new Intent(getActivity(), NavDrawer_Cash.class));
         }   else if(position==1){
             startActivity(new Intent(getActivity(), NavDrawer_Bills.class));
         }   else {
             startActivity(new Intent(getActivity(), NavDrawer_SpendSummary.class));
+        }*/
+
+        switch(position) {
+            case 0:
+                    startActivity(new Intent(getActivity(), NavDrawer_Cash.class));
+                    break;
+
+            case 1:
+                    startActivity(new Intent(getActivity(), NavDrawer_Bills.class));
+                    break;
+
+            case 2:
+                    startActivity(new Intent(getActivity(), NavDrawer_SpendSummary.class));
+                    break;
         }
 
+
     }
+
 }
