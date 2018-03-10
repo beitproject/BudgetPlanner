@@ -12,13 +12,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 public class AddExpense extends AppCompatActivity {
 
@@ -28,12 +33,27 @@ public class AddExpense extends AppCompatActivity {
     int year_x, month_x, day_x;
     static final int Dialog_Id = 0;
     private FloatingActionButton mFABexpense;
+    DatabaseHelper dbhelper;
+    EditText amt,desc, edit_category, edit_date;
+    String clickedItemName;
+    Date date;
+    String FINAL_DATE,YEAR,MONTH,DAY;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense);
+
+        //database call
+        dbhelper = new DatabaseHelper(this);
+
+        amt = (EditText)findViewById(R.id.expense_editamt);
+        desc = (EditText)findViewById(R.id.expense_editspend);
+        mFABexpense = (FloatingActionButton) findViewById(R.id.expense_submit_btn);
+
+        addData();      //method call to add data to db
 
         final Calendar cal = Calendar.getInstance();
         year_x = cal.get(Calendar.YEAR);
@@ -55,7 +75,7 @@ public class AddExpense extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SpinnerItem clickedItem = (SpinnerItem) parent.getItemAtPosition(position);
-                String clickedItemName = clickedItem.getCategoryName();
+                clickedItemName = clickedItem.getCategoryName();
                 Toast.makeText(AddExpense.this, clickedItemName + "\t Category Selected", Toast.LENGTH_SHORT).show();
             }
 
@@ -73,15 +93,43 @@ public class AddExpense extends AppCompatActivity {
 
         //to implement Submit Floating Action Button
 
-      /*  mFABexpense = (FloatingActionButton) findViewById(R.id.expense_submit_btn);
 
-        mFABexpense.setOnClickListener(new View.OnClickListener() {
+        /*mFABexpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent expense_intent = new Intent(AddExpense.this, NavDrawer_SpendSummary.class);
                 startActivity(expense_intent);
             }
         });*/
+    }
+
+    //Method for adding data to database
+      public void addData(){
+        mFABexpense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float floatamt = Float.valueOf(amt.getText().toString());
+                YEAR = Integer.toString(year_x);
+                MONTH = Integer.toString(month_x);
+                DAY = Integer.toString(day_x);
+                FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
+                /*try {
+                    date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }*/
+
+                boolean isInserted = dbhelper.insertData(floatamt,desc.getText().toString(),clickedItemName,FINAL_DATE);
+                if(isInserted =true)
+                    Toast.makeText(AddExpense.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(AddExpense.this,"Data Not Inserted", Toast.LENGTH_LONG).show();
+                //On data inserted redirect to display Cash Transactions
+                    Intent tocash = new Intent(AddExpense.this,NavDrawer_Cash.class);
+                    startActivity(tocash);
+                    finish();
+            }
+        });
     }
 
     //Method to add elements to Spinner

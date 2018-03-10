@@ -71,8 +71,8 @@ public class NavigationDrawerFragment extends Fragment implements InformationDra
 
     public static List<InformationDrawer> getData(){
         List<InformationDrawer> data=new ArrayList<>();
-        int[] icons={R.drawable.ic_drawer_cash, R.drawable.ic_bills, R.drawable.ic_spend_summary};
-        String[] titles={"Cash","Bills","Spend Summary"};
+        int[] icons={R.drawable.ic_drawer_cash, R.drawable.ic_bills, R.drawable.ic_spend_summary,R.drawable.ic_income_icon};
+        String[] titles={"Cash","Bills","Spend Summary","Income"};
         for (int i=0;i<titles.length && i<icons.length;i++){
             InformationDrawer current=new InformationDrawer();
             current.iconId=icons[i];
@@ -148,6 +148,10 @@ public class NavigationDrawerFragment extends Fragment implements InformationDra
 
             case 2:
                     startActivity(new Intent(getActivity(), NavDrawer_SpendSummary.class));
+                    break;
+
+            case 3:
+                    startActivity(new Intent(getActivity(), NavDrawer_Income.class));
                     break;
         }
 
