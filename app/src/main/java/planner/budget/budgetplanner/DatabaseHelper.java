@@ -35,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table IF NOT EXISTS " + EXPENSE_TABLE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE TEXT)");
-        db.execSQL("create table "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE TEXT)");
+        db.execSQL("create table IF NOT EXISTS "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE TEXT)");
     }
 
     @Override
