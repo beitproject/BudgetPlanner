@@ -52,11 +52,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
-        <activity android:name=".NavDrawer_Income"
+        <activity
+            android:name=".NavDrawer_Income"
             android:label="Income">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="planner.budget.budgetplanner.MainActivity"/>
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
+        <activity
+            android:name=".EditExpense"
+            android:label="Edit Expense">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
+       <activity
+           android:name=".EditIncome"
+           android:label="Edit Income">
+           <meta-data
+               android:name="android.support.PARENT_ACTIVITY"
+               android:value="planner.budget.budgetplanner.MainActivity" />
+
         </activity>
         <activity android:name=".budget_page" />
         <activity android:name=".Spend_page" />

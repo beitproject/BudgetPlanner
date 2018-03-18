@@ -98,7 +98,8 @@ public class Income_ListView_Adapter extends ArrayAdapter<Income_List_Item> {
         layoutHandler.AMOUNT.setText(incomeListItem.getToStringIncome_list_amount());
         layoutHandler.DESCRIPTION.setText(incomeListItem.getIncome_list_description());
         layoutHandler.CATEGORY.setText(incomeListItem.getIncome_list_category());
-        layoutHandler.DATE.setText(incomeListItem.getIncome_list_date());
+        //to format date to displayed on listview
+        layoutHandler.DATE.setText(incomeListItem.getIncome_list_date().substring(0,10));
         layoutHandler.IMAGE.setImageResource(images[pos]);
         return row;
         }

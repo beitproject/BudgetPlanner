@@ -16,8 +16,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -32,6 +35,7 @@ public class AddIncome extends AppCompatActivity {
     DatabaseHelper dbhelper;
     EditText Income_amt, Income_desc, Income_category, Income_date;
     Button income_btn;
+    Date date;
     String FINAL_DATE,YEAR,MONTH,DAY;
 
     @Override
@@ -94,7 +98,13 @@ public class AddIncome extends AppCompatActivity {
                 MONTH = Integer.toString(month_x);
                 DAY = Integer.toString(day_x);
                 FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
-               boolean isInserted =  dbhelper.income_insertData(floatamt, Income_desc.getText().toString(), nclickedItemName, FINAL_DATE);
+                try {
+                    date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+               boolean isInserted =  dbhelper.income_insertData(floatamt, Income_desc.getText().toString(), nclickedItemName, date);
                 if (isInserted == true)
                     Toast.makeText(AddIncome.this, "Data Inserted", Toast.LENGTH_LONG).show();
                 else
