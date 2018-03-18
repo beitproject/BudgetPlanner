@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -25,6 +27,7 @@ public class NavDrawer_Cash extends AppCompatActivity {
     SQLiteDatabase sqLiteDatabase;
     DatabaseHelper cash_dbhelper;
     Cursor cash_cursor;
+    Cursor data;
     public static Cursor cash_cursor_category;
     ListView_Adapter listView_adapter;
     Cash_List_Item cashListItem;
@@ -72,6 +75,7 @@ public class NavDrawer_Cash extends AppCompatActivity {
         cash_dbhelper = new DatabaseHelper(getApplicationContext());
         sqLiteDatabase=cash_dbhelper.getReadableDatabase();
         cash_cursor = cash_dbhelper.getData();
+
        //
         // listView_adapter = new ListView_Adapter(getApplicationContext(),R.layout.listview_layout_row);
         // test method to retrieve category String
@@ -100,8 +104,57 @@ public class NavDrawer_Cash extends AppCompatActivity {
         }
 
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               String l_description="",l_category="",l_date="";
+                float l_amt=0;
+                int l_id=0;
+                int i=0;
+                int db_count=cash_cursor.getCount();
+                int row_position;
+
+                long index = parent.getItemIdAtPosition(position);
+                //Toast.makeText(NavDrawer_Cash.this,""+position,Toast.LENGTH_LONG).show();
+                int no = (int)index;
+                //row_position = db_count - no;
+                //Toast.makeText(NavDrawer_Cash.this,""+row_position,Toast.LENGTH_LONG).show();
+
+                //to retrieve onclick item data on ListView from Database
+                           if(cash_cursor.moveToFirst()) {
+                                for (i=0/*1*/;i<=no/*row_position*/;i++) {
+                                    if (i == no/*(row_position-1)*/) {
+                                        l_id = cash_cursor.getInt(0);
+                                        l_amt = cash_cursor.getFloat(1);
+                                        l_description = cash_cursor.getString(2);
+                                        l_category = cash_cursor.getString(3);
+                                        l_date = cash_cursor.getString(4);
+                                        break;
+                                    }
+                                    cash_cursor.moveToNext();
+                                }
+                            }
 
 
+                    Log.d("ID=",String.valueOf(l_id));
+                    Log.d("l_description",l_description);
+                    Log.d("l_category",l_category);
+                    Log.d("l_date",l_date);
+                    Log.d("Count",String.valueOf(db_count));
+                    Intent edit_expense = new Intent(NavDrawer_Cash.this,EditExpense.class);
+                    edit_expense.putExtra("ID",l_id);
+                    edit_expense.putExtra("Amount",l_amt);
+                    edit_expense.putExtra("Description",l_description);
+                    edit_expense.putExtra("Category",l_category);
+                    edit_expense.putExtra("Date", l_date);
+                    startActivity(edit_expense);
+                    finish();
+                    //data = cash_dbhelper.deleteSelectedData(l_id,l_amt);
+                    //Log.d("deleteSelectedData()","Data deleted");
+                    listView_adapter.notifyDataSetChanged();
+
+            }
+        });
     }
 
 
@@ -163,9 +216,10 @@ public class NavDrawer_Cash extends AppCompatActivity {
               // Toast.makeText(getApplicationContext(),e.getMessage().toString(),Toast.LENGTH_LONG).show();
 
            }
-           Log.d(list_category_name,"Correct");
+           //Log.d(list_category_name,"Correct");
            return list_category_name;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

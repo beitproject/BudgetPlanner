@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -63,7 +66,7 @@ public class ListView_Adapter extends ArrayAdapter<Cash_List_Item> {
         //category_icon=cashListItem.getList_category();
         //category_icon="Books";
       String category_icon = NavDrawer_Cash.forCategoryString();
-      Log.d(category_icon,"Category ListAdapter");
+     // Log.d(category_icon,"Category ListAdapter");
         for(i=0;i<category_names.length;i++){
             if(category_names[i].equals(category_icon)){
                 pos=i;
@@ -72,7 +75,7 @@ public class ListView_Adapter extends ArrayAdapter<Cash_List_Item> {
             else{
                 pos=category_names.length-1;}
         }
-        Log.d(String.valueOf(pos),"pos");
+        //Log.d(String.valueOf(pos),"pos");
         return pos;
 
 
@@ -134,7 +137,9 @@ public class ListView_Adapter extends ArrayAdapter<Cash_List_Item> {
         layoutHandler.AMOUNT.setText(cashListItem.getToStringList_amount());
         layoutHandler.DESCRIPTION.setText(cashListItem.getList_description());
         layoutHandler.CATEGORY.setText(cashListItem.getList_category());
-        layoutHandler.DATE.setText(cashListItem.getList_date());
+        // to convert date format to be displayed in listview
+        layoutHandler.DATE.setText(cashListItem.getList_date().substring(0,10));
+
         layoutHandler.IMAGE.setImageResource(images[pos]);
         return row;
 

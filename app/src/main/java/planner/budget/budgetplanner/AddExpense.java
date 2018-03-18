@@ -27,8 +27,8 @@ import java.text.DateFormat;
 
 public class AddExpense extends AppCompatActivity {
 
-    private ArrayList<SpinnerItem> mSpinnerList;
-    private Spinner_Adapter mAdapter;
+    public ArrayList<SpinnerItem> mSpinnerList;
+    public Spinner_Adapter mAdapter;
     Button btn;
     int year_x, month_x, day_x;
     static final int Dialog_Id = 0;
@@ -64,9 +64,10 @@ public class AddExpense extends AppCompatActivity {
 
         showDialogOnButtonClick();  //Calendar function call
 
-        Spinner spinnerItems = (Spinner) findViewById(R.id.spinner);
+       final Spinner spinnerItems = (Spinner) findViewById(R.id.spinner);
 
         spinnerItems.setPrompt("Select a Category");
+
 
         mAdapter = new Spinner_Adapter(this, mSpinnerList);
         spinnerItems.setAdapter(mAdapter);
@@ -74,6 +75,7 @@ public class AddExpense extends AppCompatActivity {
         spinnerItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //spinnerItems.setSelection(48); //default Category selection
                 SpinnerItem clickedItem = (SpinnerItem) parent.getItemAtPosition(position);
                 clickedItemName = clickedItem.getCategoryName();
                 Toast.makeText(AddExpense.this, clickedItemName + "\t Category Selected", Toast.LENGTH_SHORT).show();
@@ -81,7 +83,6 @@ public class AddExpense extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -113,13 +114,13 @@ public class AddExpense extends AppCompatActivity {
                 MONTH = Integer.toString(month_x);
                 DAY = Integer.toString(day_x);
                 FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
-                /*try {
+                try {
                     date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
                 } catch (ParseException e) {
                     e.printStackTrace();
-                }*/
+                }
 
-                boolean isInserted = dbhelper.insertData(floatamt,desc.getText().toString(),clickedItemName,FINAL_DATE);
+                boolean isInserted = dbhelper.insertData(floatamt,desc.getText().toString(),clickedItemName,date);
                 if(isInserted =true)
                     Toast.makeText(AddExpense.this, "Data Inserted", Toast.LENGTH_LONG).show();
                 else
@@ -133,7 +134,7 @@ public class AddExpense extends AppCompatActivity {
     }
 
     //Method to add elements to Spinner
-    private void initList(){
+    public void initList(){
         mSpinnerList = new ArrayList<>();
         mSpinnerList.add(new SpinnerItem("Acc to Acc", R.drawable.vc_acc_to_acc));
         mSpinnerList.add(new SpinnerItem("Air Tickets", R.drawable.vc_air_tickets));
@@ -212,7 +213,7 @@ public class AddExpense extends AppCompatActivity {
             year_x = year;
             month_x = month + 1;
             day_x = dayOfMonth;
-            Toast.makeText(AddExpense.this, year_x + " / " + month_x + " / " + day_x, Toast.LENGTH_LONG).show();
+            Toast.makeText(AddExpense.this, year_x + " / " + month_x + " / " + day_x, Toast.LENGTH_SHORT).show();
         }
     };
 

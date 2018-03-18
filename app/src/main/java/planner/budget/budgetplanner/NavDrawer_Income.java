@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class NavDrawer_Income extends AppCompatActivity {
@@ -61,6 +63,48 @@ public class NavDrawer_Income extends AppCompatActivity {
 
             }while (income_cursor.moveToNext());
         }
+
+        nListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String l_description="",l_category="",l_date="";
+                float l_amt=0;
+                int l_id=0;
+                int i=0;
+                long index = parent.getItemIdAtPosition(position);
+                //Toast.makeText(NavDrawer_Income.this,""+position,Toast.LENGTH_LONG).show();
+                int no = (int)index;
+
+                //to retrieve onclick item data on ListView from Database
+                if(income_cursor.moveToFirst()) {
+                    for (i=0/*1*/;i<=no/*row_position*/;i++) {
+                        if (i == no/*(row_position-1)*/) {
+                            l_id = income_cursor.getInt(0);
+                            l_amt = income_cursor.getFloat(1);
+                            l_description = income_cursor.getString(2);
+                            l_category = income_cursor.getString(3);
+                            l_date = income_cursor.getString(4);
+                            break;
+                        }
+                        income_cursor.moveToNext();
+                    }
+                }
+
+                Log.d("ID=",String.valueOf(l_id));
+                Log.d("l_description",l_description);
+                Log.d("l_category",l_category);
+                Log.d("l_date",l_date);
+                //Log.d("Count",String.valueOf(db_count));
+                Intent edit_income = new Intent(NavDrawer_Income.this,EditIncome.class);
+                edit_income.putExtra("ID",l_id);
+                edit_income.putExtra("Amount",l_amt);
+                edit_income.putExtra("Description",l_description);
+                edit_income.putExtra("Category",l_category);
+                edit_income.putExtra("Date", l_date);
+                startActivity(edit_income);
+                finish();
+            }
+        });
 
     }
 
