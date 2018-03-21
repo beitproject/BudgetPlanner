@@ -100,6 +100,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor_income;
     }
 
+    // *******To export expense data to csv*******
+    public Cursor csvexpense_getData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery("Select AMOUNT,DATE from "+ EXPENSE_TABLE_NAME ,null);
+        return c;
+    }
+
 
     //test method to retrieve category String
    public Cursor getCategoryString(){
