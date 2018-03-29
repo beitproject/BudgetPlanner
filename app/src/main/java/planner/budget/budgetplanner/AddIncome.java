@@ -12,11 +12,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -24,14 +28,27 @@ public class AddIncome extends AppCompatActivity {
 
     private ArrayList<Income_SpinnerItem> nSpinnerList;
     private Income_Spinner_Adapter nAdapter;
-    Button income_btn;
+    FloatingActionButton mFAB_add_income;
     int year_x, month_x, day_x;
     static final int Dialog_Id = 0;
+    String nclickedItemName;
+    DatabaseHelper dbhelper;
+    EditText Income_amt, Income_desc, Income_category, Income_date;
+    Button income_btn;
+    Date date;
+    String FINAL_DATE,YEAR,MONTH,DAY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_income);
+
+        dbhelper = new DatabaseHelper(this);
+
+        //activity_add_income attributes init
+        Income_amt = (EditText)findViewById(R.id.income_editamt);
+        Income_desc = (EditText)findViewById(R.id.income_editspend);
+        mFAB_add_income = (FloatingActionButton) findViewById(R.id.income_submit_btn);
 
         final Calendar cal = Calendar.getInstance();
         year_x = cal.get(Calendar.YEAR);
@@ -41,6 +58,8 @@ public class AddIncome extends AppCompatActivity {
         initList(); //Spinner function call
 
         showDialogOnButtonClick();  //Calendar function call
+
+        income_addData();       //Income add data function call
 
         Spinner income_spinnerItems = (Spinner) findViewById(R.id.income_spinner);
 
@@ -53,7 +72,7 @@ public class AddIncome extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Income_SpinnerItem nclickedItem = (Income_SpinnerItem) parent.getItemAtPosition(position);
-                String nclickedItemName = nclickedItem.getnCategoryName();
+                nclickedItemName = nclickedItem.getnCategoryName();
                 Toast.makeText(AddIncome.this, nclickedItemName + "\t Category Selected", Toast.LENGTH_SHORT).show();
             }
 
@@ -68,6 +87,34 @@ public class AddIncome extends AppCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void income_addData() {
+        mFAB_add_income.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float floatamt = Float.valueOf(Income_amt.getText().toString());
+                YEAR = Integer.toString(year_x);
+                MONTH = Integer.toString(month_x);
+                DAY = Integer.toString(day_x);
+                FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
+                try {
+                    date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+               boolean isInserted =  dbhelper.income_insertData(floatamt, Income_desc.getText().toString(), nclickedItemName, date);
+                if (isInserted == true)
+                    Toast.makeText(AddIncome.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(AddIncome.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+                //On Data Inserted redirect to display Income
+                Intent toincome = new Intent(AddIncome.this,NavDrawer_Income.class);
+                startActivity(toincome);
+                finish();
+            }
+        });
     }
 
     // Methods to add elements to Spiner IncomePage
