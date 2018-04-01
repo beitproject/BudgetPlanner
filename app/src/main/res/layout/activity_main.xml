@@ -67,11 +67,12 @@
                                 android:id="@+id/p1"
                                 android:layout_width="match_parent"
                                 android:layout_height="30dp"
-                                android:text="@string/prediction"
+                                android:text="@string/available_balance"
 
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/Balance_Homepage"
                                 android:layout_width="match_parent"
                                 android:layout_height="100dp"
                                 android:text="@string/_5500_rs"

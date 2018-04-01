@@ -1,14 +1,18 @@
 package planner.budget.budgetplanner;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.mikephil.charting.charts.PieChart;
@@ -29,6 +33,12 @@ public class MainActivity extends AppCompatActivity {
     PieChart piechart;
     private FloatingActionButton mFAB_item1;
     private FloatingActionButton mFAB_item2;
+    SQLiteDatabase sqLiteDatabase;
+    public static DatabaseHelper dbhelper;
+    public static Cursor cursor_balance,cursor_currentbal;
+    public static float view_bal;
+    public static TextView display_balance;
+
 
 
     @Override
@@ -45,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
         NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+
+        //database call
+        dbhelper = new DatabaseHelper(this);
+        sqLiteDatabase = dbhelper.getReadableDatabase();
+        cursor_balance = dbhelper.balance_getData();
+
+        display_balance = (TextView) findViewById(R.id.Balance_Homepage);
 
         //to implement onClickListener for AddIncome
         mFAB_item1= (FloatingActionButton) findViewById(R.id.menu_item1);
@@ -67,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(item2_intent);
             }
         });
+
+        initbalance(); //initialize balance func call
+
+        displayCurrentBalance();            //To display current Balance on Cardview
 
         //to implement bar graph and pie chart
         try {
@@ -131,6 +152,32 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    //**To initialize balance record**********
+    public void initbalance(){
+        ///*****for initializing Balance data
+        if(cursor_balance.getCount() == 0){
+            //**values for initialize balance
+            String init_txntype = "INIT";
+            float init_txnamt = 0;
+            String init_category = "Others";
+            float init_bal = 0;
+            boolean isInserted = dbhelper.balance_initinsertData(init_txntype,init_txnamt,init_category,init_bal);
+            if(isInserted=true)
+                Log.d("Init data ","inserted");
+            else
+                Log.d("Init data","not inserted");
+
+        }
+    }
+
+    public static void displayCurrentBalance(){
+        cursor_currentbal = dbhelper.getCurrentBalance();
+        while(cursor_currentbal.moveToNext()){
+            view_bal = cursor_currentbal.getFloat(0);
+        }
+        display_balance.setText(String.valueOf(view_bal));
     }
 
 

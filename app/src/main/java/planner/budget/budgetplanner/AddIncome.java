@@ -3,10 +3,13 @@ package planner.budget.budgetplanner;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,16 +19,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import com.github.clans.fab.FloatingActionButton;
 
 public class AddIncome extends AppCompatActivity {
 
+    SQLiteDatabase sqLiteDatabase;
     private ArrayList<Income_SpinnerItem> nSpinnerList;
     private Income_Spinner_Adapter nAdapter;
     FloatingActionButton mFAB_add_income;
@@ -37,6 +43,8 @@ public class AddIncome extends AppCompatActivity {
     Button income_btn;
     Date date;
     String FINAL_DATE,YEAR,MONTH,DAY;
+    float floatamt;
+    Cursor cursor_balance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,9 @@ public class AddIncome extends AppCompatActivity {
         setContentView(R.layout.activity_add_income);
 
         dbhelper = new DatabaseHelper(this);
+        sqLiteDatabase = dbhelper.getReadableDatabase();
+        cursor_balance = dbhelper.balance_getData();
+
 
         //activity_add_income attributes init
         Income_amt = (EditText)findViewById(R.id.income_editamt);
@@ -58,6 +69,8 @@ public class AddIncome extends AppCompatActivity {
         initList(); //Spinner function call
 
         showDialogOnButtonClick();  //Calendar function call
+
+        initbalance();              //Initila Balance func call
 
         income_addData();       //Income add data function call
 
@@ -87,19 +100,53 @@ public class AddIncome extends AppCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
     public void income_addData() {
         mFAB_add_income.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                float floatamt = Float.valueOf(Income_amt.getText().toString());
+                floatamt = Float.valueOf(Income_amt.getText().toString());
                 YEAR = Integer.toString(year_x);
                 MONTH = Integer.toString(month_x);
+                //*****For month format mm to (2->02)
+                if(MONTH.length()==1){
+                    String for_month="0";
+                    MONTH=for_month.concat(MONTH);
+                }
+                //************************************
+
                 DAY = Integer.toString(day_x);
-                FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
+                //******For day format dd to(2->02)
+                if(DAY.length()==1){
+                    String for_day="0";
+                    DAY=for_day.concat(DAY);
+                }
+                //********************************
+                FINAL_DATE = YEAR+"-"+MONTH+"-"+DAY;
+
+                //****for appending unique date to datepicker output
+                Date dateobj = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss");
+                String time=dateFormat.format(dateobj);
+                Log.d("TIME---->",time);
+                //****************************
+
+                //***********for cropping only time out of total date****
+                time = time.substring(10,19);
+                Log.d("Edited TIME->>",time);
+                //*******************************
+
+                FINAL_DATE = FINAL_DATE.concat(time);
+                Log.d("************",FINAL_DATE);
+                //String Dateupdate = FINAL_DATE.concat(time);
+                Log.d("FINAL DATE->",FINAL_DATE);
+                //FINAL_DATE = "2018-02-29 18:55:55";
+
                 try {
-                    date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
+                    date = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss").parse(FINAL_DATE);
+                    Log.d("DATE-->",String.valueOf(date));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -109,12 +156,66 @@ public class AddIncome extends AppCompatActivity {
                     Toast.makeText(AddIncome.this, "Data Inserted", Toast.LENGTH_LONG).show();
                 else
                     Toast.makeText(AddIncome.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+
+                //*************To update Balance****
+                addBalanceData();
+
+
+                //**************************************
+
                 //On Data Inserted redirect to display Income
                 Intent toincome = new Intent(AddIncome.this,NavDrawer_Income.class);
                 startActivity(toincome);
                 finish();
             }
         });
+    }
+
+    public void addBalanceData(){
+        String txntype = "Credit";
+        float txnamt = floatamt;
+        String category = nclickedItemName;
+        Date bal_date = date;
+        float balance = 0;
+        float prev_bal;
+
+        //***To check initial balance data
+        if(cursor_balance.moveToFirst()){
+            cursor_balance.moveToLast();
+            prev_bal=cursor_balance.getFloat(5);
+            balance = prev_bal + txnamt;  //last value of balance from db - expense amt
+        }else{
+            cursor_balance.moveToFirst();
+            prev_bal=cursor_balance.getFloat(5);
+            balance = prev_bal + txnamt;
+        }
+        //****************************************************
+
+        boolean isInserted = dbhelper.balance_insertData(txntype,txnamt,category,bal_date,balance);
+        if(isInserted=true)
+            Toast.makeText(AddIncome.this,"Balance Updated",Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(AddIncome.this, "Balance not Updated",Toast.LENGTH_SHORT).show();
+
+        MainActivity.displayCurrentBalance();       //To display Balance-Homepage on new Income added
+
+    }
+
+    public void initbalance(){
+        ///*****for initializing Balance data
+        if(cursor_balance.getCount() == 0){
+            //**values for initialize balance
+            String init_txntype = "INIT";
+            float init_txnamt = 0;
+            String init_category = "Others";
+            float init_bal = 0;
+            boolean isInserted = dbhelper.balance_initinsertData(init_txntype,init_txnamt,init_category,init_bal);
+            if(isInserted=true)
+                Log.d("Init data ","inserted");
+            else
+                Log.d("Init data","not inserted");
+
+        }
     }
 
     // Methods to add elements to Spiner IncomePage

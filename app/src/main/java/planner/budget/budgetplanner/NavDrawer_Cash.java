@@ -18,6 +18,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class NavDrawer_Cash extends AppCompatActivity {
     public static Cursor cash_cursor_category;
     ListView_Adapter listView_adapter;
     Cash_List_Item cashListItem;
+    FloatingActionButton alldelcash;
     //int category_icon_index=0;
     //String category_icon="";
     //int i;
@@ -72,6 +75,7 @@ public class NavDrawer_Cash extends AppCompatActivity {
 
 
         mListView = (ListView)findViewById(R.id.cash_list_view);
+        //alldelcash = (FloatingActionButton) findViewById(R.id.all_cash_deletebtn);
         cash_dbhelper = new DatabaseHelper(getApplicationContext());
         sqLiteDatabase=cash_dbhelper.getReadableDatabase();
         cash_cursor = cash_dbhelper.getData();
@@ -155,6 +159,16 @@ public class NavDrawer_Cash extends AppCompatActivity {
 
             }
         });
+
+        //***to delete all cash records
+       /* alldelcash.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cash_dbhelper.deleteAllCash();
+                Toast.makeText(NavDrawer_Cash.this,"All data Deleted",Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
     }
 
 
@@ -208,8 +222,8 @@ public class NavDrawer_Cash extends AppCompatActivity {
                if (cash_cursor_category.moveToFirst()) {
                    do {
 
-                       list_category_name = cash_cursor_category.getString(3);
-                       Log.d(list_category_name,"Category String");
+                       list_category_name = cash_cursor_category.getString(0);
+                       //Log.d(list_category_name,"Category String");
                    } while ((cash_cursor_category.moveToNext()));
                }
            }catch(Exception e){

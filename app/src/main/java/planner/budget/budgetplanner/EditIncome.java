@@ -3,6 +3,7 @@ package planner.budget.budgetplanner;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -20,15 +21,18 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class EditIncome extends AppCompatActivity {
 
     SQLiteDatabase sqLiteDatabase;
     DatabaseHelper mdbhelper;
+    Cursor cursor_balance;
     public ArrayList<Income_SpinnerItem> editincome_mSpinnerList;
     public EditIncome_Spinner_Adapter editincome_spinner_adapter;
     public FloatingActionButton delete_income_btn, edit_income_btn;
@@ -51,6 +55,13 @@ public class EditIncome extends AppCompatActivity {
     public String selectedCategory;
     public String selectedDate;
 
+    //**Balance variables
+    public String balupdate_category,compare_balupdate_txnamt,compare_balupdate_ifeditedamt,balupdate_date;
+    public int searchid;
+    public float searchtxnamt,balupdate_balance,balupdate_txnamt,search_baltxnamt=0;   //balupdate_var are related to Balance functions********
+    public Date search_baldate;
+    public String search_date;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +72,11 @@ public class EditIncome extends AppCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        mdbhelper = new DatabaseHelper(getApplicationContext());
+        sqLiteDatabase = mdbhelper.getReadableDatabase();
+        cursor_balance = mdbhelper.balance_getData();
 
         delete_income_btn=(FloatingActionButton) findViewById(R.id.edit_income_deletebtn);
         edit_income_btn = (FloatingActionButton) findViewById(R.id.edit_income_editbtn);
@@ -133,6 +149,8 @@ public class EditIncome extends AppCompatActivity {
                 edit_income_amt.setText("");
                 edit_income_desc.setText("");
                 Toast.makeText(EditIncome.this,"Data has been Deleted!",Toast.LENGTH_LONG).show();
+
+                updateBalanceOnDeleteExpense();         //To update Balance on Income delete
             }
         });
 
@@ -150,11 +168,46 @@ public class EditIncome extends AppCompatActivity {
             public void onClick(View v) {
                 YEAR = Integer.toString(year_x);
                 MONTH = Integer.toString(month_x);
+                //*****For month format mm to (2->02)
+                if(MONTH.length()==1){
+                    String for_month="0";
+                    MONTH=for_month.concat(MONTH);
+                }
+                //************************************
                 DAY = Integer.toString(day_x);
-                FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
+                //******For day format dd to(2->02)
+                if(DAY.length()==1){
+                    String for_day="0";
+                    DAY=for_day.concat(DAY);
+                }
+                //********************************
+
+                FINAL_DATE = YEAR+"-"+MONTH+"-"+DAY;
+                Log.d("FINAL DATE",FINAL_DATE);
+
+                //****for appending unique date to datepicker output
+                Date dateobj = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss");
+                String time=dateFormat.format(dateobj);
+                Log.d("TIME---->",time);
+                //****************************
+
+                //***********for cropping only time out of total date****
+                time = time.substring(10,19);
+                Log.d("Edited TIME->>",time);
+                //*******************************
+
+                FINAL_DATE = FINAL_DATE.concat(time);
+                Log.d("************",FINAL_DATE);
+                //String Dateupdate = FINAL_DATE.concat(time);
+                Log.d("FINAL DATE->",FINAL_DATE);
+                //FINAL_DATE = "2018-02-29 18:55:55";
+
                 try {
-                    editeddate = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
-                    Log.d("Date will be updated",String.valueOf(editeddate));
+                    editeddate = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss").parse(FINAL_DATE);
+                    Log.d("DATE-->",String.valueOf(editeddate));
+
+                    //Log.d("Date will be updated",String.valueOf(editeddate));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -166,6 +219,7 @@ public class EditIncome extends AppCompatActivity {
                 if(!edit_income_amt.getText().toString().equals("") && !editeddesc.equals("")) {
                     mdbhelper.updateIncomeData(selectedId, ifedited_amount, editeddesc, editincome_clickedItemName, editeddate);
                     Toast.makeText(EditIncome.this,"Data Updated Successfully.",Toast.LENGTH_SHORT).show();
+                    updateBalanceOnEditExpense();
                 }
                 else{
                     Toast.makeText(EditIncome.this,"Please enter some data!!",Toast.LENGTH_SHORT).show();
@@ -236,6 +290,133 @@ public class EditIncome extends AppCompatActivity {
             Toast.makeText(EditIncome.this, year_x + " / " + month_x + " / " + day_x, Toast.LENGTH_SHORT).show();
         }
     };
+
+
+    public void updateBalanceOnEditExpense(){
+        String search_category="";
+
+        //Log.d("Selected Category->",check_category);
+        //Log.d("SELECTED DATE->",selectedDate);
+        if(cursor_balance.moveToFirst()){
+            do{
+                //balupdate_txnamt = cursor_balance.getFloat(2);
+                balupdate_date = cursor_balance.getString(4);
+                //compare_balupdate_txnamt = String.valueOf(balupdate_txnamt);
+
+                //Log.d("BALANCE TXNAMT->",String.valueOf(balupdate_txnamt));
+                //Log.d("BALANCE_DATE->",balupdate_date);
+                //compare_balupdate_ifeditedamt = String.valueOf(ifedited_amount);
+                if(balupdate_date.equals(selectedDate)){
+                    search_date = balupdate_date;            //matching date from balance as in expense
+                    //search_baltxnamt=balupdate_txnamt;       //matching amt from balance as in expense
+                }    else{
+                    search_date = selectedDate;
+                }
+
+            }while (cursor_balance.moveToNext());
+        }
+
+        Log.d("SEARCH_DATE->",search_date);
+
+        try {
+            search_baldate = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss").parse(search_date);
+            Log.d("DAte SENT->",String.valueOf(search_baldate));
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        Cursor data = mdbhelper.getBalanceId(search_baldate);
+        while (data.moveToNext()){
+            searchid = data.getInt(0);
+            searchtxnamt = data.getFloat(1);
+        }
+        Log.d("BalanceID:",String.valueOf(searchid));
+        Log.d("BalanceTNXAMT->",String.valueOf(searchtxnamt));
+
+        //****To adjust balance before editing expense
+        Cursor cursor_current_bal = mdbhelper.getCurrentBalance();
+        if(cursor_current_bal.moveToFirst()){
+            cursor_current_bal.moveToLast();
+            balupdate_balance=cursor_current_bal.getFloat(0);
+        }
+        Log.d("Current Balance->",String.valueOf(balupdate_balance));
+
+        //******To get previous TXNAMT
+        /*cursor_bal_tnxamt= mdbhelper.getPrevTxnamt(searchid);
+        while (cursor_bal_tnxamt.moveToNext()){
+            searchtxnamt = cursor_bal_tnxamt.getFloat(0);
+        }
+        Log.d("Searchtxnamt->",String.valueOf(searchtxnamt));*/
+
+        balupdate_balance = balupdate_balance - (searchtxnamt-ifedited_amount);   //to adjust balance before deleting
+        //Log.d("Balance update",String.valueOf(balupdate_balance));
+
+        //***To delete old record from balance table*****
+        mdbhelper.deletebalance(searchid);
+        String txntype="Credit";
+        float txnamt = ifedited_amount;
+        Date bal_date = editeddate;
+        String category = editincome_clickedItemName;
+        float balance = balupdate_balance;
+        mdbhelper.balance_insertData(txntype,txnamt,category,bal_date,balance);
+        Toast.makeText(EditIncome.this,"Balance Updated",Toast.LENGTH_SHORT).show();
+
+        MainActivity.displayCurrentBalance();           //To display Balance-Homepage on income edit
+    }
+
+    //*****To update Balance on deleting Expense**************
+    public void updateBalanceOnDeleteExpense(){
+        int last_bal_id = 0;
+        if(cursor_balance.moveToFirst()){
+            do{
+                balupdate_date = cursor_balance.getString(4);
+                if(balupdate_date.equals(selectedDate)) {
+                    search_date = balupdate_date;            //matching date from balance as in expense
+                }   else{
+                    search_date = selectedDate;
+                }
+
+            }while(cursor_balance.moveToNext());
+        }
+        try {
+            search_baldate = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss").parse(search_date);
+            Log.d("DAte SENT->",String.valueOf(search_baldate));
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        Cursor data = mdbhelper.getBalanceId(search_baldate);
+        while (data.moveToNext()){
+            searchid = data.getInt(0);
+            searchtxnamt = data.getFloat(1);
+        }
+        //****To adjust balance before editing expense
+        Cursor cursor_current_bal = mdbhelper.getCurrentBalance();
+        if(cursor_current_bal.moveToFirst()){
+            cursor_current_bal.moveToLast();
+            balupdate_balance=cursor_current_bal.getFloat(0);
+        }
+
+        balupdate_balance = balupdate_balance - searchtxnamt;   //to adjust balance before deleting
+
+        mdbhelper.deletebalance(searchid);  //to delete balance data ,deleted from expense table
+
+        Cursor cursor_last_bal = mdbhelper.getLastBalanceId();
+        if(cursor_last_bal.moveToFirst()){
+            cursor_last_bal.moveToLast();
+
+            last_bal_id = cursor_last_bal.getInt(0);
+        }
+
+        //**To update last data of balance table with new balance
+        mdbhelper.updateLastBalance(balupdate_balance,last_bal_id);
+        //**********
+
+        MainActivity.displayCurrentBalance();           //To display Balance-Homepage on income delete
+    }
+
+    //******************************************************
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id=item.getItemId();
