@@ -3,10 +3,13 @@ package planner.budget.budgetplanner;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,11 +27,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.util.Locale;
 
 public class AddExpense extends AppCompatActivity {
 
     public ArrayList<SpinnerItem> mSpinnerList;
     public Spinner_Adapter mAdapter;
+    SQLiteDatabase sqLiteDatabase;
+    Cursor cursor_balance;
     Button btn;
     int year_x, month_x, day_x;
     static final int Dialog_Id = 0;
@@ -38,6 +44,9 @@ public class AddExpense extends AppCompatActivity {
     String clickedItemName;
     Date date;
     String FINAL_DATE,YEAR,MONTH,DAY;
+    float floatamt;
+
+    MainActivity mainActivity;//MainActivity class object
 
 
 
@@ -48,10 +57,15 @@ public class AddExpense extends AppCompatActivity {
 
         //database call
         dbhelper = new DatabaseHelper(this);
+        sqLiteDatabase = dbhelper.getReadableDatabase();
+        cursor_balance = dbhelper.balance_getData();
+
 
         amt = (EditText)findViewById(R.id.expense_editamt);
         desc = (EditText)findViewById(R.id.expense_editspend);
         mFABexpense = (FloatingActionButton) findViewById(R.id.expense_submit_btn);
+
+        //initbalance(); //initialize balance func call
 
         addData();      //method call to add data to db
 
@@ -102,6 +116,7 @@ public class AddExpense extends AppCompatActivity {
                 startActivity(expense_intent);
             }
         });*/
+
     }
 
     //Method for adding data to database
@@ -109,22 +124,67 @@ public class AddExpense extends AppCompatActivity {
         mFABexpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                float floatamt = Float.valueOf(amt.getText().toString());
+                floatamt = Float.valueOf(amt.getText().toString());
                 YEAR = Integer.toString(year_x);
                 MONTH = Integer.toString(month_x);
+                //*****For month format mm to (2->02)
+                if(MONTH.length()==1){
+                    String for_month="0";
+                    MONTH=for_month.concat(MONTH);
+                }
+                //************************************
+
                 DAY = Integer.toString(day_x);
-                FINAL_DATE = DAY+"/"+MONTH+"/"+YEAR;
+
+                //******For day format dd to(2->02)
+                if(DAY.length()==1){
+                    String for_day="0";
+                    DAY=for_day.concat(DAY);
+                }
+                //********************************
+                FINAL_DATE = YEAR+"-"+MONTH+"-"+DAY;
+                Log.d("FINAL DATE",FINAL_DATE);
+
+                //****for appending unique date to datepicker output
+                //Date dateobj = Calendar.getInstance().getTime();
+                Date dateobj = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss");
+                String time=dateFormat.format(dateobj);
+                Log.d("TIME---->",time);
+                //****************************
+
+                //***********for cropping only time out of total date****
+                time = time.substring(10,19);
+                Log.d("Edited TIME->>",time);
+                //*******************************
+
+                FINAL_DATE = FINAL_DATE.concat(time);
+                Log.d("************",FINAL_DATE);
+                //String Dateupdate = FINAL_DATE.concat(time);
+                Log.d("FINAL DATE->",FINAL_DATE);
+                //FINAL_DATE = "2018-02-29 18:55:55";
                 try {
-                    date = new SimpleDateFormat("dd/mm/yyyy").parse(FINAL_DATE);
+                    date = new SimpleDateFormat("yyyy-mm-dd HH:MM:ss").parse(FINAL_DATE);
+
+                    Log.d("DATE-->",String.valueOf(date));
+                    //Log.d("TestTime->",testtime);
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
-                boolean isInserted = dbhelper.insertData(floatamt,desc.getText().toString(),clickedItemName,date);
-                if(isInserted =true)
-                    Toast.makeText(AddExpense.this, "Data Inserted", Toast.LENGTH_LONG).show();
-                else
-                    Toast.makeText(AddExpense.this,"Data Not Inserted", Toast.LENGTH_LONG).show();
+                    boolean isInserted = dbhelper.insertData(floatamt, desc.getText().toString(), clickedItemName, date);
+                    if (isInserted = true)
+                        Toast.makeText(AddExpense.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(AddExpense.this, "Data Not Inserted", Toast.LENGTH_LONG).show();
+
+                    //*************To update Balance****
+                    addBalanceData();
+
+                //Toast.makeText(AddExpense.this,"Data is Empty Cannot be Inserted",Toast.LENGTH_SHORT).show();
+
+                //**************************************
                 //On data inserted redirect to display Cash Transactions
                     Intent tocash = new Intent(AddExpense.this,NavDrawer_Cash.class);
                     startActivity(tocash);
@@ -132,6 +192,53 @@ public class AddExpense extends AppCompatActivity {
             }
         });
     }
+
+    public void addBalanceData(){
+          String txntype = "Debit";
+          float txnamt = floatamt;
+          String category = clickedItemName;
+          Date bal_date = date;
+          float balance = 0;
+          float prev_bal;
+
+        //***To check initial balance data
+          if(cursor_balance.moveToFirst()){
+              cursor_balance.moveToLast();
+              prev_bal=cursor_balance.getFloat(5);
+              balance = prev_bal - txnamt;  //last value of balance from db - expense amt
+          }else{
+            cursor_balance.moveToFirst();
+            prev_bal=cursor_balance.getFloat(5);
+            balance = prev_bal - txnamt;
+          }
+          //****************************************************
+
+        boolean isInserted = dbhelper.balance_insertData(txntype,txnamt,category,bal_date,balance);
+          if(isInserted=true)
+              Toast.makeText(AddExpense.this,"Balance Updated",Toast.LENGTH_SHORT).show();
+          else
+              Toast.makeText(AddExpense.this, "Balance not Updated",Toast.LENGTH_SHORT).show();
+
+          MainActivity.displayCurrentBalance();         //To update Homepage-Balance on new Expense
+
+    }
+
+   /* public void initbalance(){
+        ///*****for initializing Balance data
+        if(cursor_balance.getCount() == 0){
+            //**values for initialize balance
+            String init_txntype = "INIT";
+            float init_txnamt = 0;
+            String init_category = "Others";
+            float init_bal = 0;
+            boolean isInserted = dbhelper.balance_initinsertData(init_txntype,init_txnamt,init_category,init_bal);
+            if(isInserted=true)
+                Log.d("Init data ","inserted");
+            else
+                Log.d("Init data","not inserted");
+
+        }
+    }*/
 
     //Method to add elements to Spinner
     public void initList(){

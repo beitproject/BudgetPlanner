@@ -75,7 +75,7 @@ public class ListView_Adapter extends ArrayAdapter<Cash_List_Item> {
             else{
                 pos=category_names.length-1;}
         }
-        //Log.d(String.valueOf(pos),"pos");
+       // Log.d(String.valueOf(pos),"pos");
         return pos;
 
 
