@@ -162,4 +162,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(query);
 
     }
+    public Cursor getGraphData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor_graph = db.rawQuery("Select AMOUNT from "+EXPENSE_TABLE_NAME+" GROUP BY ID ORDER BY (ID) DESC ",null);
+        return cursor_graph;
+    }
 }

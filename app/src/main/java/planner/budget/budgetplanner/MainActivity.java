@@ -1,14 +1,18 @@
 package planner.budget.budgetplanner;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.mikephil.charting.charts.BarChart;
@@ -18,12 +22,14 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
+//import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
+
+import org.achartengine.GraphicalView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,7 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mFAB_item1;
     private FloatingActionButton mFAB_item2;
     BarChart barchart2;
-
+    SQLiteDatabase sqLiteDatabase;
+    DatabaseHelper dbhelper;
+    Cursor cursor_graph;
+    Float[] amt_array;
 
 
     @Override
@@ -79,56 +88,87 @@ public class MainActivity extends AppCompatActivity {
 
         //to implement bar graph and pie chart
         try {
-            Calendar calendar = Calendar.getInstance();
+            Float data=0.0f;
+           dbhelper = new DatabaseHelper(getApplicationContext());
+            sqLiteDatabase=dbhelper.getReadableDatabase();
+            cursor_graph = dbhelper.getGraphData();
+            int i =0;
+             amt_array  = new Float[5];
+             amt_array[0]=30.0f;
+            if(cursor_graph.moveToFirst()) {
+
+                do{
+                data = cursor_graph.getFloat(0);
+                    //amt_array[i] = cursor_graph.getFloat(0);
+                    Log.d("hello", data.toString());
+                    i++;
+                }while(cursor_graph.moveToNext());}
+
+
+           /* Calendar calendar = Calendar.getInstance();
             Date d1 = calendar.getTime();
             calendar.add(Calendar.DATE, 1);
             Date d2 = calendar.getTime();
             calendar.add(Calendar.DATE, 1);
-            Date d3 = calendar.getTime();
+            Date d3 = calendar.getTime();*/
 
-            GraphView graph = (GraphView) findViewById(R.id.graph);
-            BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[]{
-                    new DataPoint(0, 30),
-                    new DataPoint(1, 50),
-                    new DataPoint(2, 30),
-                    new DataPoint(3, 20),
-                    new DataPoint(4, 30)
+               /* GraphView graph = (GraphView) findViewById(R.id.graph);
+                BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[]{
+                        new DataPoint(0, 30),
+                        new DataPoint(1, 50),
+                        new DataPoint(2, 30),
+                        new DataPoint(3, 20),
+                        new DataPoint(4, 20),
+                        new DataPoint(5, 30)
 
-            });
-
-
-            series.setSpacing(20);
-           // series.setDataWidth(0.02);
-            graph.addSeries(series);
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(MainActivity.this));
-            graph.getGridLabelRenderer().setNumHorizontalLabels(5);
-            graph.getViewport().setMaxX(series.getHighestValueX()+1);
-            //graph.getViewport().setMinX(d1.getTime());
-            graph.getViewport().setScrollable(true);
-            graph.getViewport().setXAxisBoundsManual(true);
-            graph.getGridLabelRenderer().setHumanRounding(false);
-            graph.getGridLabelRenderer().setLabelsSpace(1);
-
-          /*  barchart2 = (BarChart) findViewById(R.id.bar2);
-
-            ArrayList<BarEntry> barEntries = new ArrayList<>();
-
-            barEntries.add(new BarEntry(44f,0));
-            barEntries.add(new BarEntry(22f,1));
-            barEntries.add(new BarEntry(64f,2));
-
-            BarDataSet barDataSet = new BarDataSet(barEntries,"dates");
-
-            ArrayList<String> theDates = new ArrayList<>();
-            theDates.add("JAN");4
+                });
 
 
-            BarData theData = new BarData(theDates,barDataSet);
-            barchart2.setData(theData);
+                series.setSpacing(20);
+                // series.setDataWidth(0.02);
+                graph.addSeries(series);
+                graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(MainActivity.this));
+                graph.getGridLabelRenderer().setNumHorizontalLabels(5);
+                graph.getViewport().setMaxX(series.getHighestValueX() + 1);
+                //graph.getViewport().setMinX(d1.getTime());
+                graph.getViewport().setScrollable(true);
+                graph.getViewport().setXAxisBoundsManual(true);
+                graph.getGridLabelRenderer().setHumanRounding(false);
+                graph.getGridLabelRenderer().setLabelsSpace(1);                   /*  OLD GRAPH DATA PART*/
 
 
-*/
+                Float f = 22.5f;
 
+                barchart2 = (BarChart) findViewById(R.id.bar2);
+
+                ArrayList<BarEntry> barEntries = new ArrayList<>();
+
+                barEntries.add(new BarEntry(f, 0));
+                barEntries.add(new BarEntry(data, 1));
+                barEntries.add(new BarEntry(amt_array[0], 2));
+                barEntries.add(new BarEntry(34f, 3));
+                barEntries.add(new BarEntry(14f, 4));
+
+                BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
+
+                ArrayList<String> theDates = new ArrayList<>();
+                theDates.add("JAN");
+                theDates.add("FEB");
+                theDates.add("MAR");
+                theDates.add("APR");
+                theDates.add("MAY");
+
+
+                BarData theData = new BarData(theDates, barDataSet);
+                barchart2.setData(theData);
+
+
+                Piegraph yummyPie = new Piegraph();
+                GraphicalView graphicalView = yummyPie.getGraphicalView(this,50 , 50);
+                LinearLayout pieGraph = (LinearLayout) findViewById(R.id.pie_chart);
+                pieGraph.addView(graphicalView);
+
+/*
             piechart = (PieChart) findViewById(R.id.pie_chart);
 
             piechart.setUsePercentValues(true);
@@ -148,35 +188,34 @@ public class MainActivity extends AppCompatActivity {
             PieData data = new PieData(dataSet);
             data.setValueTextColor(Color.RED);
             data.setValueTextSize(10f);
-            piechart.setData(data);
+            piechart.setData(data);*/
 
 
-            CardView card2 = (CardView) findViewById(R.id.card2);
-            card2.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View view){
-                    Intent intent = new Intent(MainActivity.this, budget_page.class);
-                    startActivity(intent);
-                }
-            });
+                CardView card2 = (CardView) findViewById(R.id.card2);
+                card2.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, budget_page.class);
+                        startActivity(intent);
+                    }
+                });
 
-            CardView card3 = (CardView) findViewById(R.id.card3);
-            card3.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View view){
-                    Intent intent = new Intent(MainActivity.this,Spend_page.class);
-                    startActivity(intent);
-                }
-            });
-            CardView card4 = (CardView) findViewById(R.id.card4);
-            card4.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View view){
-                    Intent intent = new Intent(MainActivity.this,top_spend.class);
-                    startActivity(intent);
-                }
-            });
+                CardView card3 = (CardView) findViewById(R.id.card3);
+                card3.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, Spend_page.class);
+                        startActivity(intent);
+                    }
+                });
+                CardView card4 = (CardView) findViewById(R.id.card4);
+                card4.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, top_spend.class);
+                        startActivity(intent);
+                    }
+                });
 
 
-
-        } catch (Exception e) {
+            } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -187,5 +226,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
+        return getWritableDatabase();
     }
 }

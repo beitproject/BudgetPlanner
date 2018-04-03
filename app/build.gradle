@@ -35,7 +35,7 @@ android {
 }
 dependencies {
     implementation 'com.android.support:design:25.4.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.github.PhilJay:MPAndroidChart:v2.0.9'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -50,5 +50,5 @@ dependencies {
     compile 'com.github.clans:fab:1.6.4'
     testCompile 'junit:junit:4.12'
     compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.2'
-
+    implementation files('achartengine.jar')
 }
