@@ -25,6 +25,7 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,9 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mFAB_item2;
     SQLiteDatabase sqLiteDatabase;
     public static DatabaseHelper dbhelper;
-    public static Cursor cursor_balance,cursor_currentbal;
+    public static Cursor cursor_currentbal,cursor_balance;
     public static float view_bal;
     public static TextView display_balance;
+    Cursor cursor_balance_id;
+    int balance_id = 0;
 
 
 
@@ -60,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
         dbhelper = new DatabaseHelper(this);
         sqLiteDatabase = dbhelper.getReadableDatabase();
         cursor_balance = dbhelper.balance_getData();
+        cursor_balance_id = dbhelper.getLastBalanceId();
+
+
 
         display_balance = (TextView) findViewById(R.id.Balance_Homepage);
 
@@ -87,7 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
         initbalance(); //initialize balance func call
 
+        updateBalanceOnAllDataDeleted();            //To set balance to 0 when all data deleted
+
         displayCurrentBalance();            //To display current Balance on Cardview
+
 
         //to implement bar graph and pie chart
         try {
@@ -170,6 +179,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Init data","not inserted");
 
         }
+    }
+
+    public void updateBalanceOnAllDataDeleted(){
+        if(cursor_balance_id.getCount() == 1 && cursor_balance_id.moveToFirst()){
+            cursor_balance_id.moveToLast();
+            balance_id = cursor_balance_id.getInt(0);
+            float balupdate_bal = 0;
+            dbhelper.updateBalanceOnAllDataDelete(balance_id,balupdate_bal);
+        }
+
     }
 
     public static void displayCurrentBalance(){
