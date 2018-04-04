@@ -286,4 +286,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //*******************************
+
+    //****To update Balance to 0 after deleting all records
+    public void updateBalanceOnAllDataDelete(int balance_id,float balupdate_bal){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "Update "+BALANCE_TABLE_NAME+" set "+BALANCE_AMT+" = "+balupdate_bal+" where ID ='"+balance_id+ "' ";
+        db.execSQL(query);
+    }
 }
