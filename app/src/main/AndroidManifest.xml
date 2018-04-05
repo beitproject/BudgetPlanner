@@ -69,13 +69,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
-       <activity
-           android:name=".EditIncome"
-           android:label="Edit Income">
-           <meta-data
-               android:name="android.support.PARENT_ACTIVITY"
-               android:value="planner.budget.budgetplanner.MainActivity" />
-
+        <activity
+            android:name=".EditIncome"
+            android:label="Edit Income">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
+        </activity>
+        <activity
+            android:name=".NavDrawer_Balance"
+            android:label="Balance">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="planner.budget.budgetplanner.MainActivity" />
         </activity>
         <activity android:name=".budget_page" />
         <activity android:name=".Spend_page" />

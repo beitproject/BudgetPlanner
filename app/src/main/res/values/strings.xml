@@ -38,4 +38,5 @@
     <string name="expense_hintspend">Description</string>
     <string name="calendar_btntext">Select a Date</string>
     <string name="expense_textview">Select a category</string>
+    <string name="available_balance">Available Balance</string>
 </resources>

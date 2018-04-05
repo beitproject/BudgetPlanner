@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.mikephil.charting.charts.BarChart;
@@ -32,6 +33,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import org.achartengine.GraphicalView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -49,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
     Float[] amt_array;
     Float [] array2 ;
     Float data=55.0f;
+    SQLiteDatabase sqLiteDatabase;
+    public static DatabaseHelper dbhelper;
+    public static Cursor cursor_currentbal,cursor_balance;
+    public static float view_bal;
+    public static TextView display_balance;
+    Cursor cursor_balance_id;
+    int balance_id = 0;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
         NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+
+        //database call
+        dbhelper = new DatabaseHelper(this);
+        sqLiteDatabase = dbhelper.getReadableDatabase();
+        cursor_balance = dbhelper.balance_getData();
+        cursor_balance_id = dbhelper.getLastBalanceId();
+
+
+
+        display_balance = (TextView) findViewById(R.id.Balance_Homepage);
 
         //to implement onClickListener for AddIncome
         mFAB_item1= (FloatingActionButton) findViewById(R.id.menu_item1);
@@ -86,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(item2_intent);
             }
         });
+
+        initbalance(); //initialize balance func call
+
+        updateBalanceOnAllDataDeleted();            //To set balance to 0 when all data deleted
+
+        displayCurrentBalance();            //To display current Balance on Cardview
+
 
         //to implement bar graph and pie chart
         try {
@@ -230,6 +258,42 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout pieGraph = (LinearLayout) findViewById(R.id.pie_chart);
         pieGraph.addView(graphicalView);
 
+    }
+
+    //**To initialize balance record**********
+    public void initbalance(){
+        ///*****for initializing Balance data
+        if(cursor_balance.getCount() == 0){
+            //**values for initialize balance
+            String init_txntype = "INIT";
+            float init_txnamt = 0;
+            String init_category = "Others";
+            float init_bal = 0;
+            boolean isInserted = dbhelper.balance_initinsertData(init_txntype,init_txnamt,init_category,init_bal);
+            if(isInserted=true)
+                Log.d("Init data ","inserted");
+            else
+                Log.d("Init data","not inserted");
+
+        }
+    }
+
+    public void updateBalanceOnAllDataDeleted(){
+        if(cursor_balance_id.getCount() == 1 && cursor_balance_id.moveToFirst()){
+            cursor_balance_id.moveToLast();
+            balance_id = cursor_balance_id.getInt(0);
+            float balupdate_bal = 0;
+            dbhelper.updateBalanceOnAllDataDelete(balance_id,balupdate_bal);
+        }
+
+    }
+
+    public static void displayCurrentBalance(){
+        cursor_currentbal = dbhelper.getCurrentBalance();
+        while(cursor_currentbal.moveToNext()){
+            view_bal = cursor_currentbal.getFloat(0);
+        }
+        display_balance.setText(String.valueOf(view_bal));
     }
 
 
