@@ -293,7 +293,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "Update "+BALANCE_TABLE_NAME+" set "+BALANCE_AMT+" = "+balupdate_bal+" where ID ='"+balance_id+ "' ";
         db.execSQL(query);
     }
-    public Cursor getGraphData(){
+    public  Cursor getGraphData(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor_graph = db.rawQuery("Select AMOUNT,DATE from "+EXPENSE_TABLE_NAME+" GROUP BY ID ORDER BY (ID) DESC ",null);
         return cursor_graph;

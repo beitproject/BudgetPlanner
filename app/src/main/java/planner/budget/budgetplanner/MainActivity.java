@@ -45,9 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mFAB_item1;
     private FloatingActionButton mFAB_item2;
     BarChart barchart2;
-    SQLiteDatabase sqLiteDatabase;
-    DatabaseHelper dbhelper;
-    Cursor cursor_graph;
+    public static Cursor cursor_graph;
     Float[] amt_array;
     Float [] array2 ;
     Float data=55.0f;
@@ -58,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     public static TextView display_balance;
     Cursor cursor_balance_id;
     int balance_id = 0;
+    int bal_pie=0;
+    int budget_pie=0;
 
 
 
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
         //to implement bar graph and pie chart
         try {
 
-           dbhelper = new DatabaseHelper(getApplicationContext());
-            sqLiteDatabase=dbhelper.getReadableDatabase();
+           //dbhelper = new DatabaseHelper(getApplicationContext());
+            //sqLiteDatabase=dbhelper.getReadableDatabase();
             cursor_graph = dbhelper.getGraphData();
             int i =0;
             ArrayList<Float> al= new ArrayList<>();
@@ -134,11 +134,18 @@ public class MainActivity extends AppCompatActivity {
                     i++;
                 }while(cursor_graph.moveToNext());}
 
+                //checking if db is empty
+                if (al.isEmpty()){
+                for (i=0;i<=5;i++){
+                array2[i]=0.0f;
+                }
+                }
+                else{                   //assigning values form the db to the array for DB
                 int size= al.size();
             array2 = new Float[size];
                 for(i= 0;i<=size;i++){
                     array2[i]=al.get(i);
-                }
+                }}
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -181,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
 
-                barEntries.add(new BarEntry(array2[0], 0));
+                barEntries.add(new BarEntry(array2[0], 0));         //values in array are from the DB
                 barEntries.add(new BarEntry(array2[1], 1));
                 barEntries.add(new BarEntry(array2[2], 2));
                 barEntries.add(new BarEntry(array2[3], 3));
@@ -190,11 +197,11 @@ public class MainActivity extends AppCompatActivity {
                 BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
 
                 ArrayList<String> theDates = new ArrayList<>();
-                theDates.add("JAN");
-                theDates.add("FEB");
-                theDates.add("MAR");
-                theDates.add("APR");
-                theDates.add("MAY");
+                theDates.add("Month 1");
+                theDates.add("Month 2");
+                theDates.add("Month 3");
+                theDates.add("Month 4");
+                theDates.add("Month 5");
 
 
                 BarData theData = new BarData(theDates, barDataSet);
@@ -260,37 +267,39 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     //**To initialize balance record**********
-    public void initbalance(){
+        public void initbalance () {
         ///*****for initializing Balance data
-        if(cursor_balance.getCount() == 0){
+        if (cursor_balance.getCount() == 0) {
             //**values for initialize balance
             String init_txntype = "INIT";
             float init_txnamt = 0;
             String init_category = "Others";
             float init_bal = 0;
-            boolean isInserted = dbhelper.balance_initinsertData(init_txntype,init_txnamt,init_category,init_bal);
-            if(isInserted=true)
-                Log.d("Init data ","inserted");
+            boolean isInserted = dbhelper.balance_initinsertData(init_txntype, init_txnamt, init_category, init_bal);
+            if (isInserted = true)
+                Log.d("Init data ", "inserted");
             else
-                Log.d("Init data","not inserted");
+                Log.d("Init data", "not inserted");
 
         }
     }
 
-    public void updateBalanceOnAllDataDeleted(){
-        if(cursor_balance_id.getCount() == 1 && cursor_balance_id.moveToFirst()){
+    public void updateBalanceOnAllDataDeleted() {
+        if (cursor_balance_id.getCount() == 1 && cursor_balance_id.moveToFirst()) {
             cursor_balance_id.moveToLast();
             balance_id = cursor_balance_id.getInt(0);
             float balupdate_bal = 0;
-            dbhelper.updateBalanceOnAllDataDelete(balance_id,balupdate_bal);
+            dbhelper.updateBalanceOnAllDataDelete(balance_id, balupdate_bal);
         }
 
     }
 
-    public static void displayCurrentBalance(){
+    public static void displayCurrentBalance() {
         cursor_currentbal = dbhelper.getCurrentBalance();
-        while(cursor_currentbal.moveToNext()){
+        while (cursor_currentbal.moveToNext()) {
             view_bal = cursor_currentbal.getFloat(0);
         }
         display_balance.setText(String.valueOf(view_bal));
@@ -306,4 +315,5 @@ public class MainActivity extends AppCompatActivity {
     public SQLiteDatabase getWritableDatabase() {
         return getWritableDatabase();
     }
+
 }
