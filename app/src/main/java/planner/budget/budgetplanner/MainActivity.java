@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper dbhelper;
     Cursor cursor_graph;
     Float[] amt_array;
-
+    Float [] array2 ;
+    Float data=55.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,21 +89,32 @@ public class MainActivity extends AppCompatActivity {
 
         //to implement bar graph and pie chart
         try {
-            Float data=0.0f;
+
            dbhelper = new DatabaseHelper(getApplicationContext());
             sqLiteDatabase=dbhelper.getReadableDatabase();
             cursor_graph = dbhelper.getGraphData();
             int i =0;
-             amt_array  = new Float[5];
-             amt_array[0]=30.0f;
+            ArrayList<Float> al= new ArrayList<>();
+            // amt_array  = new Float[5];
+             //amt_array[0]=60.0f;
             if(cursor_graph.moveToFirst()) {
 
                 do{
-                data = cursor_graph.getFloat(0);
-                    //amt_array[i] = cursor_graph.getFloat(0);
+                //data = cursor_graph.getFloat(0);
+                    al.add(cursor_graph.getFloat(0));
                     Log.d("hello", data.toString());
                     i++;
                 }while(cursor_graph.moveToNext());}
+
+                int size= al.size();
+            array2 = new Float[size];
+                for(i= 0;i<=size;i++){
+                    array2[i]=al.get(i);
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
 
 
            /* Calendar calendar = Calendar.getInstance();
@@ -137,17 +149,15 @@ public class MainActivity extends AppCompatActivity {
                 graph.getGridLabelRenderer().setLabelsSpace(1);                   /*  OLD GRAPH DATA PART*/
 
 
-                Float f = 22.5f;
-
                 barchart2 = (BarChart) findViewById(R.id.bar2);
 
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
 
-                barEntries.add(new BarEntry(f, 0));
-                barEntries.add(new BarEntry(data, 1));
-                barEntries.add(new BarEntry(amt_array[0], 2));
-                barEntries.add(new BarEntry(34f, 3));
-                barEntries.add(new BarEntry(14f, 4));
+                barEntries.add(new BarEntry(array2[0], 0));
+                barEntries.add(new BarEntry(array2[1], 1));
+                barEntries.add(new BarEntry(array2[2], 2));
+                barEntries.add(new BarEntry(array2[3], 3));
+                barEntries.add(new BarEntry(array2[4], 4));
 
                 BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
 
@@ -160,13 +170,12 @@ public class MainActivity extends AppCompatActivity {
 
 
                 BarData theData = new BarData(theDates, barDataSet);
+                barchart2.setScaleEnabled(false);
+                barchart2.setDoubleTapToZoomEnabled(false);
                 barchart2.setData(theData);
 
 
-                Piegraph yummyPie = new Piegraph();
-                GraphicalView graphicalView = yummyPie.getGraphicalView(this,50 , 50);
-                LinearLayout pieGraph = (LinearLayout) findViewById(R.id.pie_chart);
-                pieGraph.addView(graphicalView);
+
 
 /*
             piechart = (PieChart) findViewById(R.id.pie_chart);
@@ -215,9 +224,11 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-            } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        Piegraph yummyPie = new Piegraph();
+        GraphicalView graphicalView = yummyPie.getGraphicalView(this,50 , 50);
+        LinearLayout pieGraph = (LinearLayout) findViewById(R.id.pie_chart);
+        pieGraph.addView(graphicalView);
 
     }
 

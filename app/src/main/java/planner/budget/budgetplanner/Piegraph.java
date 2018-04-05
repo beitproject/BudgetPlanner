@@ -37,6 +37,13 @@ public GraphicalView getGraphicalView(Context context,int largeslide,int mediums
         defaultRenderer.addSeriesRenderer(simpleSeriesRenderer);
     }
 
+    defaultRenderer.setLabelsTextSize(30f);
+    defaultRenderer.setLabelsColor(Color.BLACK);
+    defaultRenderer.setLegendTextSize(30f);
+    defaultRenderer.setPanEnabled(false);
+    defaultRenderer.setDisplayValues(true);
+    defaultRenderer.setChartTitleTextSize(30);
+
     return ChartFactory.getPieChartView(context,series,defaultRenderer);
 }
 
