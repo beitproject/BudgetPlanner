@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.mikephil.charting.charts.BarChart;
@@ -32,10 +33,17 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import org.achartengine.GraphicalView;
 
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -51,13 +59,20 @@ public class MainActivity extends AppCompatActivity {
     Float data=55.0f;
     SQLiteDatabase sqLiteDatabase;
     public static DatabaseHelper dbhelper;
-    public static Cursor cursor_currentbal,cursor_balance;
+    public static Cursor cursor_currentbal,cursor_balance,cursor_getmonthdata,cursor_getexpensedate,cursor_summonth;
     public static float view_bal;
     public static TextView display_balance;
     Cursor cursor_balance_id;
     int balance_id = 0;
     int bal_pie=0;
     int budget_pie=0;
+    public static ArrayList<String> expense_getdate = new ArrayList<>();
+    public static float expensemonthamt;
+    public static ArrayList<String> editexpense_getdate = new ArrayList<>();
+    public static ArrayList<String> distinctexpensedate = new ArrayList<>();
+    //public static ArrayList<String> compareeditexpense_getdate = new ArrayList<>();
+    public static ArrayList<String> duplicateexpensedate = new ArrayList<>();
+
 
 
 
@@ -81,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         sqLiteDatabase = dbhelper.getReadableDatabase();
         cursor_balance = dbhelper.balance_getData();
         cursor_balance_id = dbhelper.getLastBalanceId();
+        cursor_getexpensedate = dbhelper.getUniqueMonthDate();
+        cursor_getmonthdata = dbhelper.getMonthData();
+
 
 
 
@@ -114,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         displayCurrentBalance();            //To display current Balance on Cardview
 
+        calculateMonthData();               //To SUM month expense data
 
         //to implement bar graph and pie chart
         try {
@@ -130,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 do{
                 //data = cursor_graph.getFloat(0);
                     al.add(cursor_graph.getFloat(0));
-                    Log.d("hello", data.toString());
+                    //Log.d("hello", data.toString());
                     i++;
                 }while(cursor_graph.moveToNext());}
 
@@ -188,11 +207,11 @@ public class MainActivity extends AppCompatActivity {
 
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
 
-                barEntries.add(new BarEntry(array2[0], 0));         //values in array are from the DB
-                barEntries.add(new BarEntry(array2[1], 1));
-                barEntries.add(new BarEntry(array2[2], 2));
-                barEntries.add(new BarEntry(array2[3], 3));
-                barEntries.add(new BarEntry(array2[4], 4));
+                barEntries.add(new BarEntry(data/*array2[0]*/, 0));         //values in array are from the DB
+                barEntries.add(new BarEntry(data/*array2[1]*/, 1));
+                barEntries.add(new BarEntry(data /*array2[2]*/, 2));
+                barEntries.add(new BarEntry(data /*array2[3]*/, 3));
+                barEntries.add(new BarEntry(data/*array2[4]*/, 4));
 
                 BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
 
@@ -304,6 +323,145 @@ public class MainActivity extends AppCompatActivity {
         }
         display_balance.setText(String.valueOf(view_bal));
     }
+
+    //To calculate and store Total month expense**********
+    public void calculateMonthData() {
+        if (cursor_getexpensedate.moveToFirst()) {
+            do {
+                expense_getdate.add(cursor_getexpensedate.getString(0));
+            } while (cursor_getexpensedate.moveToNext());
+        }
+        /*for(int i=0;i<expense_getdate.size();i++){
+            Log.d("ExpenseDate->",expense_getdate.get(i));
+        }*/
+
+        //to edit the retrieved date to yyyy-mm
+        for (int i = 0; i < expense_getdate.size(); i++) {
+
+            String editedexpensedate = expense_getdate.get(i).substring(0, 7);
+            editexpense_getdate.add(editedexpensedate);
+            //Log.d("EditedExpenseDate->",editexpense_getdate.get(i));
+        }
+
+        /*for (int i = 0; i < editexpense_getdate.size(); i++) {
+            String transferdate = editexpense_getdate.get(i);
+            compareeditexpense_getdate.add(transferdate);
+            Log.d("compare->", compareeditexpense_getdate.get(i));
+        }*/
+
+
+        /*int j;
+        int eqcount = 0;
+        for(int i=0;i<editexpense_getdate.size();i++){
+            for(j=0;j<compareeditexpense_getdate.size();j++){
+                if(editexpense_getdate.get(i).equals(compareeditexpense_getdate.get(j))) {
+                    eqcount = 1;
+                    }
+                }
+                if(eqcount == 0){
+                    String movetransferdate = editexpense_getdate.get(i);
+                    distinctexpensedate.add(movetransferdate);
+                    Log.d("DistinctDates->", distinctexpensedate.get(i));
+                }
+
+            }*/
+        //To get unique date ****************
+        Set<String> set = new HashSet<String>();
+        for(int i=0;i<editexpense_getdate.size();i++)
+        set.add(editexpense_getdate.get(i));
+        Log.d("Set", String.valueOf(set));
+        for (String s:set){
+            Log.d("String",s);
+        }
+        //set.addAll(Arrays.asList(editexpense_getdate));
+
+        //*Treeset to arrange month in ascending order**********
+        Set<String> set_asc = new TreeSet<String>(set);
+        for(String s1:set_asc)
+            Log.d("Treeset->",s1);
+
+        /*for(int i=0;i<distinctexpensedate.size();i++) {
+            String date1 = distinctexpensedate.get(i);
+            cursor_summonth = dbhelper.getSumMonthData(date1);
+            if (cursor_summonth.moveToFirst()) {
+                cursor_summonth.moveToFirst();
+                expensemonthamt = cursor_summonth.getFloat(0);
+                Log.d("Month->", String.valueOf(expensemonthamt));
+            }
+        }*/
+
+        //*****To delete monthdata before updating new
+        if(cursor_getmonthdata.getCount()>=1){
+            dbhelper.deleteMonthData();
+        }
+
+
+        String year_split,month_split,monthtitle;
+        float monthsumamt;
+        for(String s:set_asc){
+            String date1 = s;
+            cursor_summonth = dbhelper.getSumMonthData(date1);
+            if(cursor_summonth.moveToFirst()) {
+                cursor_summonth.moveToFirst();
+                expensemonthamt = cursor_summonth.getFloat(0);
+                Log.d("MonthSUM->", String.valueOf(expensemonthamt));
+                year_split = s.substring(0, 4);
+                //Log.d("Year->",year_split);
+                month_split = s.substring(5, 7);
+                //Log.d("Month->",month_split);
+
+                //***Logic for converting month index to Textlabel (01->JAN)****
+                switch (month_split) {
+                    case "01":
+                        month_split = "JAN";
+                        break;
+                    case "02":
+                        month_split = "FEB";
+                        break;
+                    case "03":
+                        month_split = "MAR";
+                        break;
+                    case "04":
+                        month_split = "APR";
+                        break;
+                    case "05":
+                        month_split = "MAY";
+                        break;
+                    case "06":
+                        month_split = "JUNE";
+                        break;
+                    case "07":
+                        month_split = "JULY";
+                        break;
+                    case "08":
+                        month_split = "AUG";
+                        break;
+                    case "09":
+                        month_split = "SEPT";
+                        break;
+                    case "10":
+                        month_split = "OCT";
+                        break;
+                    case "11":
+                        month_split = "NOV";
+                        break;
+                    case "12":
+                        month_split = "DEC";
+                        break;
+                }
+                //******************************************
+
+                    monthtitle = month_split.concat(year_split);
+                    monthsumamt = expensemonthamt;
+
+                boolean isInserted = dbhelper.month_insertData(monthtitle, monthsumamt);
+                    if (isInserted = true)
+                        Log.d("MonthSUM data ", "inserted");
+                    else
+                        Log.d("MonthSUM data", "not inserted");
+                }
+            }
+        }
 
 
     @Override

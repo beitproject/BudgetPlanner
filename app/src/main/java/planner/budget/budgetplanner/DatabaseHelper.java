@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import org.apache.commons.collections4.splitmap.AbstractIterableGetMapDecorator;
+import org.apache.poi.hssf.record.aggregates.CustomViewSettingsRecordAggregate;
 
+import java.sql.SQLInput;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,9 +41,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String BALANCE_CATEGORY = "CATEGORY";
     public static final String BALANCE_DATE = "date";
     public static final String BALANCE_AMT = "balance";
+    public static final String MONTH_DATA_TABLE = "month_data";
+    public static final String MONTH_TITLE = "month_title";
+    public static final String MONTH_AMOUNT = "month_amount";
+    //public static final String MONTH_DATE = "month_date";
 
     public DatabaseHelper(Context context/*, String name, SQLiteDatabase.CursorFactory factory, int version*/) {
-        super(context, DATABASE_NAME, null, 5); //Change version number when new table is made or edited
+        super(context, DATABASE_NAME, null, 9); //Change version number when new table is made or edited
         SQLiteDatabase db = this.getWritableDatabase();
     }
 
@@ -52,6 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //db.execSQL("create table IF NOT EXISTS "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE TEXT)");
         db.execSQL("create table IF NOT EXISTS "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE DATE)");
         db.execSQL("create table IF NOT EXISTS "+ BALANCE_TABLE_NAME+" (ID INTEGER PRIMARY KEY AUTOINCREMENT, TXNTYPE TEXT, TXNAMT FLOAT, CATEGORY TEXT, DATE DATE, BALANCE FLOAT)");
+        db.execSQL("create table "+MONTH_DATA_TABLE+" (MONTH_TITLE TEXT,MONTH_AMOUNT FLOAT)");
     }
 
     @Override
@@ -59,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+ EXPENSE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS "+INCOME_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS "+BALANCE_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+MONTH_DATA_TABLE);
         onCreate(db);
     }
 
@@ -125,6 +133,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(BALANCE_DATE,new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         contentValues.put(BALANCE_AMT, init_bal);
         long result = db.insert(BALANCE_TABLE_NAME, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    //For inserting data in Month_data Table
+    public boolean month_insertData(String monthtitle, float monthsumamt){
+        SQLiteDatabase db =this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MONTH_TITLE,monthtitle);
+        contentValues.put(MONTH_AMOUNT,monthsumamt);
+        long result = db.insert(MONTH_DATA_TABLE,null, contentValues);
         if(result == -1)
             return false;
         else
@@ -297,5 +318,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor_graph = db.rawQuery("Select AMOUNT,DATE from "+EXPENSE_TABLE_NAME+" GROUP BY ID ORDER BY (ID) DESC ",null);
         return cursor_graph;
+    }
+
+    public Cursor getSumMonthData(String date1){
+        SQLiteDatabase db =this.getWritableDatabase();
+        String query = "Select SUM(AMOUNT) from expense_table where DATE BETWEEN '"+date1+"-01 00:00:00' AND '"+date1+"-31 23:59:59'";
+        Cursor cursor_summonth = db.rawQuery(query,null);
+        return cursor_summonth;
+    }
+
+    public Cursor getUniqueMonthDate(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "Select DATE from expense_table GROUP BY DATE ORDER BY (DATE)";
+        Cursor cursor_uniquemonthdate = db.rawQuery(query,null);
+        return cursor_uniquemonthdate;
+    }
+
+    //***To delete monthdata for updating new
+    public void deleteMonthData(){
+        SQLiteDatabase db =this.getWritableDatabase();
+        String query = "DELETE FROM "+MONTH_DATA_TABLE;
+        db.execSQL(query);
+    }
+
+    public Cursor getMonthData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "Select * from " + MONTH_DATA_TABLE;
+        Cursor cursor_getmonthdata = db.rawQuery(query, null);
+        return cursor_getmonthdata;
     }
 }
