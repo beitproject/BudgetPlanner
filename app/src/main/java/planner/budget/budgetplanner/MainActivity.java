@@ -72,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<String> distinctexpensedate = new ArrayList<>();
     //public static ArrayList<String> compareeditexpense_getdate = new ArrayList<>();
     public static ArrayList<String> duplicateexpensedate = new ArrayList<>();
-
+    float bar0,bar1,bar2,bar3,bar4;
+    String m0="",m1="",m2="",m3="",m4="";
+    String[] months;
 
 
 
@@ -133,42 +135,59 @@ public class MainActivity extends AppCompatActivity {
         displayCurrentBalance();            //To display current Balance on Cardview
 
         calculateMonthData();               //To SUM month expense data
+        months = new String[5];
+        array2 = new Float[5];
+        for (int i =0;i<5;i++){
+            array2[i]=0.0f;
+            months[i]="";
+        }
 
         //to implement bar graph and pie chart
         try {
 
            //dbhelper = new DatabaseHelper(getApplicationContext());
             //sqLiteDatabase=dbhelper.getReadableDatabase();
-            cursor_graph = dbhelper.getGraphData();
+            cursor_graph = dbhelper.getMonthData();
             int i =0;
             ArrayList<Float> al= new ArrayList<>();
+            ArrayList<String> as = new ArrayList<>();
             // amt_array  = new Float[5];
              //amt_array[0]=60.0f;
             if(cursor_graph.moveToFirst()) {
 
                 do{
                 //data = cursor_graph.getFloat(0);
-                    al.add(cursor_graph.getFloat(0));
-                    //Log.d("hello", data.toString());
+                    al.add(cursor_graph.getFloat(1));
+                    as.add(cursor_graph.getString(0));
                     i++;
                 }while(cursor_graph.moveToNext());}
 
                 //checking if db is empty
-                if (al.size()<=5){
-                for (i=0;i<=5;i++){
+                if (al.isEmpty()){
+                for (i=0;i<=4;i++){
                 array2[i]=0.0f;
                 }
                 }
                 else{                   //assigning values form the db to the array for DB
                 int size= al.size();
-            array2 = new Float[size];
-                for(i= 0;i<=size;i++){
+            //array2 = new Float[size];
+                for(i= 0;i<size;i++){
                     array2[i]=al.get(i);
-                }}
-        } catch (Exception e) {
-            e.printStackTrace();
+                    months[i]=as.get(i);
 
-        }
+                }}
+
+            bar0=array2[0];
+            bar1=array2[1];
+            bar2=array2[2];
+            bar3=array2[3];
+            bar4=array2[4];
+
+            m0=months[0].toString();
+            m1=months[1].toString();
+            m2=months[2].toString();
+            m3=months[3].toString();
+            m4=months[4].toString();
 
 
            /* Calendar calendar = Calendar.getInstance();
@@ -203,31 +222,37 @@ public class MainActivity extends AppCompatActivity {
                 graph.getGridLabelRenderer().setLabelsSpace(1);                   /*  OLD GRAPH DATA PART*/
 
 
-                barchart2 = (BarChart) findViewById(R.id.bar2);
 
-                ArrayList<BarEntry> barEntries = new ArrayList<>();
+    barchart2 = (BarChart) findViewById(R.id.bar2);
 
-                barEntries.add(new BarEntry(data/*array2[0]*/, 0));         //values in array are from the DB
-                barEntries.add(new BarEntry(data/*array2[1]*/, 1));
-                barEntries.add(new BarEntry(data /*array2[2]*/, 2));
-                barEntries.add(new BarEntry(data /*array2[3]*/, 3));
-                barEntries.add(new BarEntry(data/*array2[4]*/, 4));
-
-                BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
-
-                ArrayList<String> theDates = new ArrayList<>();
-                theDates.add("Month 1");
-                theDates.add("Month 2");
-                theDates.add("Month 3");
-                theDates.add("Month 4");
-                theDates.add("Month 5");
+    ArrayList<BarEntry> barEntries = new ArrayList<>();
+                        barEntries.add(new BarEntry(bar0, 0));         //values in array are from the DB
+                        barEntries.add(new BarEntry(bar1, 1));
+                        barEntries.add(new BarEntry(bar2, 2));
+                        barEntries.add(new BarEntry(bar3, 3));
+                        barEntries.add(new BarEntry(bar4, 4));
 
 
-                BarData theData = new BarData(theDates, barDataSet);
-                barchart2.setScaleEnabled(false);
-                barchart2.setDoubleTapToZoomEnabled(false);
-                barchart2.setData(theData);
 
+    BarDataSet barDataSet = new BarDataSet(barEntries, "dates");
+
+    ArrayList<String> theDates = new ArrayList<>();
+    theDates.add(m0);
+    theDates.add(m1);
+    theDates.add(m2);
+    theDates.add(m3);
+    theDates.add(m4);
+
+
+    BarData theData = new BarData(theDates, barDataSet);
+    barchart2.setScaleEnabled(false);
+    barchart2.setDoubleTapToZoomEnabled(false);
+    barchart2.setData(theData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
 
 
 
