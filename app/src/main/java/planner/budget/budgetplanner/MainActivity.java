@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 }while(cursor_graph.moveToNext());}
 
                 //checking if db is empty
-                if (al.isEmpty()){
+                if (al.size()<=5){
                 for (i=0;i<=5;i++){
                 array2[i]=0.0f;
                 }
@@ -259,9 +259,11 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
+        bal_pie=(Integer)(Math.round(view_bal));
+        budget_pie=(Integer)(Math.round(view_bal));
 
         Piegraph yummyPie = new Piegraph();
-        GraphicalView graphicalView = yummyPie.getGraphicalView(this,50 , 50);
+        GraphicalView graphicalView = yummyPie.getGraphicalView(this,bal_pie , 50);
         LinearLayout pieGraph = (LinearLayout) findViewById(R.id.pie_chart);
         pieGraph.addView(graphicalView);
 
