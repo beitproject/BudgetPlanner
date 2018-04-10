@@ -20,7 +20,7 @@ public GraphicalView getGraphicalView(Context context,int largeslide,int mediums
     CategorySeries series =new CategorySeries("Remaining Bugdet");
 
     int[] portions ={largeslide,mediumslide};
-    String[] seriesNames = new String[] {"Budget","Balance"};
+    String[] seriesNames = new String[] {"Balance","Spent"};
 
     int numSlides = 2;
 
