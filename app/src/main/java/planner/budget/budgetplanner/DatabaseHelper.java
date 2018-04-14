@@ -14,6 +14,7 @@ import java.sql.SQLInput;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Queue;
 
 /**
  * Created by Rohit on 27-02-2018.
@@ -45,9 +46,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MONTH_TITLE = "month_title";
     public static final String MONTH_AMOUNT = "month_amount";
     //public static final String MONTH_DATE = "month_date";
+    public static final String PREDICTION_CSV_TABLE = "prediction_input";
+    public static final String PREDICTION_DATE = "prediction_date";
+    public static final String PREDICTION_AMOUNT = "prediction_amount";
 
     public DatabaseHelper(Context context/*, String name, SQLiteDatabase.CursorFactory factory, int version*/) {
-        super(context, DATABASE_NAME, null, 9); //Change version number when new table is made or edited
+        super(context, DATABASE_NAME, null, 10); //Change version number when new table is made or edited
         SQLiteDatabase db = this.getWritableDatabase();
     }
 
@@ -58,7 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //db.execSQL("create table IF NOT EXISTS "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE TEXT)");
         db.execSQL("create table IF NOT EXISTS "+ INCOME_TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, AMOUNT FLOAT, DESCRIPTION TEXT, CATEGORY TEXT, DATE DATE)");
         db.execSQL("create table IF NOT EXISTS "+ BALANCE_TABLE_NAME+" (ID INTEGER PRIMARY KEY AUTOINCREMENT, TXNTYPE TEXT, TXNAMT FLOAT, CATEGORY TEXT, DATE DATE, BALANCE FLOAT)");
-        db.execSQL("create table "+MONTH_DATA_TABLE+" (MONTH_TITLE TEXT,MONTH_AMOUNT FLOAT)");
+        db.execSQL("create table IF NOT EXISTS "+MONTH_DATA_TABLE+" (MONTH_TITLE TEXT,MONTH_AMOUNT FLOAT)");
+        db.execSQL("create table IF NOT EXISTS "+PREDICTION_CSV_TABLE+" (PREDICTION_DATE TEXT, PREDICTION_AMOUNT FLOAT)");
     }
 
     @Override
@@ -67,6 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+INCOME_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS "+BALANCE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS "+MONTH_DATA_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS "+PREDICTION_CSV_TABLE);
         onCreate(db);
     }
 
@@ -146,6 +152,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(MONTH_TITLE,monthtitle);
         contentValues.put(MONTH_AMOUNT,monthsumamt);
         long result = db.insert(MONTH_DATA_TABLE,null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    //***For inserting day data in prediction_csv table***********
+    public boolean days_insertData(String predictiondate, float predictionamount){
+        SQLiteDatabase db =this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PREDICTION_DATE,predictiondate);
+        contentValues.put(PREDICTION_AMOUNT,predictionamount);
+        long result = db.insert(PREDICTION_CSV_TABLE , null, contentValues);
         if(result == -1)
             return false;
         else
@@ -340,11 +359,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "DELETE FROM "+MONTH_DATA_TABLE;
         db.execSQL(query);
     }
-
+    //***To get MonthData*********
     public Cursor getMonthData() {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "Select * from " + MONTH_DATA_TABLE;
         Cursor cursor_getmonthdata = db.rawQuery(query, null);
         return cursor_getmonthdata;
     }
+
+    //***To delete all prediction_csv table data to update new data***
+    public void deleteDaysData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "DELETE FROM "+PREDICTION_CSV_TABLE;
+        db.execSQL(query);
+    }
+
+    //****To get DayData**************
+    public Cursor getDaysData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "Select * from "+PREDICTION_CSV_TABLE;
+        Cursor cursor_getdaydata = db.rawQuery(query,null);
+        return  cursor_getdaydata;
+    }
+
+    //****To get sum amount of a day**********
+    public Cursor getSumDayData(String day_date){
+        SQLiteDatabase db =this.getWritableDatabase();
+        String query = "Select SUM(AMOUNT) from expense_table where DATE BETWEEN '"+day_date+" 00:00:00' AND '"+day_date+" 23:59:59'";
+        Cursor cursor_getsumdayamt = db.rawQuery(query,null);
+        return cursor_getsumdayamt;
+    }
+
+
 }

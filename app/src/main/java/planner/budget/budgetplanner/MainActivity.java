@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -33,6 +35,9 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import org.achartengine.GraphicalView;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
     Float data=55.0f;
     SQLiteDatabase sqLiteDatabase;
     public static DatabaseHelper dbhelper;
-    public static Cursor cursor_currentbal,cursor_balance,cursor_getmonthdata,cursor_getexpensedate,cursor_summonth;
+    public static Cursor cursor_currentbal,cursor_balance,cursor_getmonthdata,cursor_getexpensedate,cursor_summonth,
+            cursor_getdaydata,cursor_getsumdayamt;
     public static float view_bal;
     public static TextView display_balance;
     Cursor cursor_balance_id;
@@ -69,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<String> expense_getdate = new ArrayList<>();
     public static float expensemonthamt;
     public static ArrayList<String> editexpense_getdate = new ArrayList<>();
-    public static ArrayList<String> distinctexpensedate = new ArrayList<>();
-    //public static ArrayList<String> compareeditexpense_getdate = new ArrayList<>();
+    public static ArrayList<String> expenseday_getdate = new ArrayList<>();
+    public static ArrayList<String> editexpenseday_getdate = new ArrayList<>();
     public static ArrayList<String> duplicateexpensedate = new ArrayList<>();
     float bar0,bar1,bar2,bar3,bar4;
     String m0="",m1="",m2="",m3="",m4="";
@@ -100,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         cursor_balance_id = dbhelper.getLastBalanceId();
         cursor_getexpensedate = dbhelper.getUniqueMonthDate();
         cursor_getmonthdata = dbhelper.getMonthData();
+        cursor_getdaydata = dbhelper.getDaysData();
 
 
 
@@ -134,7 +141,12 @@ public class MainActivity extends AppCompatActivity {
 
         displayCurrentBalance();            //To display current Balance on Cardview
 
+        //dayCalculateData();                 //To calculate day wise data for prediction csv
+
         calculateMonthData();               //To SUM month expense data
+
+        new PredictionCSVTask().execute();          //For running ASYNC TASK in Background
+
         months = new String[5];
         array2 = new Float[5];
         for (int i =0;i<5;i++){
@@ -282,8 +294,9 @@ public class MainActivity extends AppCompatActivity {
                 CardView card2 = (CardView) findViewById(R.id.card2);
                 card2.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, budget_page.class);
-                        startActivity(intent);
+                        /*Intent intent = new Intent(MainActivity.this, budget_page.class);
+                        startActivity(intent);*/
+                        new PredictionCSVTask().execute();
                     }
                 });
 
@@ -489,6 +502,145 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+
+    public class PredictionCSVTask extends AsyncTask<String,String,String> {
+        @Override
+        protected void onPostExecute(String s) {
+            //super.onPostExecute(s);
+            Toast.makeText(MainActivity.this, "Task Done", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            if (cursor_getexpensedate.moveToFirst()) {
+                do {
+                    expenseday_getdate.add(cursor_getexpensedate.getString(0));
+                } while (cursor_getexpensedate.moveToNext());
+            }
+            for (int i = 0; i < expenseday_getdate.size(); i++) {
+
+                String editedexpensedaydate = expenseday_getdate.get(i).substring(0,10);
+                editexpenseday_getdate.add(editedexpensedaydate);
+                //Log.d("EditedExpenseDate->",editexpense_getdate.get(i));
+            }
+
+            //To get unique date
+            Set<String> set_day = new HashSet<String>();
+            for (int i = 0; i < editexpense_getdate.size(); i++)
+                set_day.add(editexpenseday_getdate.get(i));
+            Log.d("SETDATE->", String.valueOf(set_day));
+
+            Set<String> set_day_asc = new TreeSet<String>(set_day);
+            for (String tree : set_day_asc)
+                Log.d("Tree-Day", tree);
+
+
+            //***To delete day data before updating new**********
+            if (cursor_getdaydata.getCount() >= 1) {
+                dbhelper.deleteDaysData();
+            }
+
+            /*float get_predictamt;
+            cursor_getsumdayamt = dbhelper.getSumDayData("2018-04-11");
+            if(cursor_getsumdayamt.moveToFirst()){
+                cursor_getsumdayamt.moveToFirst();
+                get_predictamt = cursor_getsumdayamt.getFloat(0);
+                Log.d("BG",String.valueOf(get_predictamt));
+            }*/
+
+
+            String predictiondate;
+            float predictionamount, get_predictionamount;
+            for (String s_day : set_day_asc) {
+                String day_date = s_day;
+                cursor_getsumdayamt = dbhelper.getSumDayData(day_date);
+                if (cursor_getsumdayamt.moveToFirst()) {
+                    cursor_getsumdayamt.moveToFirst();
+                    get_predictionamount = cursor_getsumdayamt.getFloat(0);
+                    Log.d("DAYSUM->", String.valueOf(get_predictionamount));
+                    predictiondate = day_date;
+                    predictionamount = get_predictionamount;
+                    boolean isInserted = dbhelper.days_insertData(predictiondate, predictionamount);
+                    if (isInserted = true)
+                        Log.d("DAYSUM data ", "inserted");
+                    else
+                        Log.d("DAYSUM data", "not inserted");
+                }
+
+            }
+
+            ///*****To create csv for algo input *****
+            try {
+
+                File folder = Environment.getExternalStorageDirectory();
+                String fileName = folder.getPath() + "/MyExpenses.csv";
+
+                File myFile = new File(fileName);
+                if(myFile.exists())
+                    myFile.delete();
+                Log.d("File Loc",fileName);
+
+                int rowcount = 0;
+                int colcount = 0;
+                File sdCardDir = Environment.getExternalStorageDirectory();
+                String filename = "MyExpenses.csv";  //the name of the file to export with
+
+                File saveFile = new File(sdCardDir, filename);
+                FileWriter fw = new FileWriter(saveFile);
+
+                Cursor cursor_csv = dbhelper.getDaysData();
+                BufferedWriter bw = new BufferedWriter(fw);
+                rowcount = cursor_csv.getCount();
+                colcount = cursor_csv.getColumnCount();
+
+                /*if (rowcount > 0) {
+                    cursor_csv.moveToFirst();
+
+                    for (int i = 0; i < colcount; i++) {
+                        if (i != colcount - 1) {
+                            bw.write(cursor_csv.getColumnName(i) + ",");
+                        } else {
+                            bw.write(cursor_csv.getColumnName(i));
+                        }
+                    }
+                }
+                bw.newLine();*/
+
+                for (int i = 0; i < rowcount; i++) {
+                    cursor_csv.moveToPosition(i);
+
+                    for (int j = 0; j < colcount; j++) {
+                        if (j != colcount - 1) {
+                            bw.write(cursor_csv.getString(j) + ",");
+                        } else {
+                            bw.write(cursor_csv.getString(j));
+                        }
+                    }
+                    bw.newLine();
+                }
+                bw.flush();
+                //Toast.makeText(MainActivity.this, "Exported Data Successfully", Toast.LENGTH_LONG).show();
+
+
+
+            }
+            catch (Exception ex) {
+                //if(sqLiteDatabase.isOpen()) {
+                //sqLiteDatabase.close();
+                //Toast.makeText(MainActivity.this, "" + ex.getMessage().toString(), Toast.LENGTH_LONG).show();
+                //}
+            } finally {
+
+            }
+
+
+
+            //***************************************
+
+            return null;
+        }
+    }
 
 
     @Override
