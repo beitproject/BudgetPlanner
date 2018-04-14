@@ -135,12 +135,7 @@ public class MainActivity extends AppCompatActivity {
         displayCurrentBalance();            //To display current Balance on Cardview
 
         calculateMonthData();               //To SUM month expense data
-        months = new String[5];
-        array2 = new Float[5];
-        for (int i =0;i<5;i++){
-            array2[i]=0.0f;
-            months[i]="";
-        }
+
 
         //to implement bar graph and pie chart
         try {
@@ -153,6 +148,8 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> as = new ArrayList<>();
             // amt_array  = new Float[5];
              //amt_array[0]=60.0f;
+
+
             if(cursor_graph.moveToFirst()) {
 
                 do{
@@ -161,7 +158,13 @@ public class MainActivity extends AppCompatActivity {
                     as.add(cursor_graph.getString(0));
                     i++;
                 }while(cursor_graph.moveToNext());}
-
+            int size= al.size();
+            months = new String[5];
+            array2 = new Float[size];
+            for ( i =0;i<5;i++){
+                array2[i]=0.0f;
+                months[i]="";
+            }
                 //checking if db is empty
                 if (al.isEmpty()){
                 for (i=0;i<=4;i++){
@@ -169,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 }
                 else{                   //assigning values form the db to the array for DB
-                int size= al.size();
+                //int size= al.size();
             //array2 = new Float[size];
-                for(i= 0;i<size;i++){
+                for(i= 0;i<=4;i++){
                     array2[i]=al.get(i);
                     months[i]=as.get(i);
 
