@@ -159,22 +159,34 @@ public class MainActivity extends AppCompatActivity {
                     i++;
                 }while(cursor_graph.moveToNext());}
             int size= al.size();
-            months = new String[5];
-            array2 = new Float[size];
-            for ( i =0;i<5;i++){
+            //logic for the graph month bwlow and above 5 months
+            if(size>=5){
+                months = new String[size];
+                array2 = new Float[size];
+            for ( i =0;i<size;i++){
                 array2[i]=0.0f;
                 months[i]="";
+            }}
+            else{
+                months = new String[5];
+                array2 = new Float[5];
+                for ( i =0;i<5;i++){
+                    array2[i]=0.0f;
+                    months[i]="";
+                }
             }
+
+
                 //checking if db is empty
                 if (al.isEmpty()){
-                for (i=0;i<=4;i++){
+                for (i=0;i<size;i++){
                 array2[i]=0.0f;
                 }
                 }
                 else{                   //assigning values form the db to the array for DB
                 //int size= al.size();
             //array2 = new Float[size];
-                for(i= 0;i<=4;i++){
+                for(i= 0;i<size;i++){
                     array2[i]=al.get(i);
                     months[i]=as.get(i);
 
