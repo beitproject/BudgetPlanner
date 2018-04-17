@@ -105,14 +105,14 @@
                                 android:id="@+id/p2"
                                 android:layout_width="match_parent"
                                 android:layout_height="30dp"
-                                android:text="@string/Budget_label"
+                                android:text="@string/predicted_expense"
 
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="70dp"
-                                android:text="@string/Budgetamt"
+                                android:text="@string/Predicted_expense"
                                 android:textAlignment="center"
                                 android:textSize="30sp" />
 
@@ -120,9 +120,9 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="4dp"
-                                android:text="@string/edit_label"
                                 android:textAlignment="viewEnd"
                                 android:textSize="15sp" />
+                                <!--android:text="@string/edit_label"-->
 
                         </LinearLayout>
 

@@ -39,4 +39,6 @@
     <string name="calendar_btntext">Select a Date</string>
     <string name="expense_textview">Select a category</string>
     <string name="available_balance">Available Balance</string>
+    <string name="predicted_expense">Predicted Expense</string>
+    <string name="Predicted_expense">0.0 Rs</string>
 </resources>
