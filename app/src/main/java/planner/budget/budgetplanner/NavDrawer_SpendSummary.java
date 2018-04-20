@@ -31,7 +31,7 @@ import com.ajts.androidmads.library.SQLiteToExcel;
 import com.github.mikephil.charting.utils.Utils;
 
 public class NavDrawer_SpendSummary extends AppCompatActivity {
-    Button exportcsvbtn;
+    //Button exportcsvbtn;
     SQLiteDatabase sqLiteDatabase;
     DatabaseHelper dbhelper;
     public Cursor c;
@@ -50,7 +50,7 @@ public class NavDrawer_SpendSummary extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        exportcsvbtn = (Button) findViewById(R.id.export_csv_button);
+        //exportcsvbtn = (Button) findViewById(R.id.export_csv_button);
         exportexcelbtn = (FloatingActionButton) findViewById(R.id.export_excel_btn);
         dbhelper = new DatabaseHelper(getApplicationContext());
         sqLiteDatabase = dbhelper.getReadableDatabase();
@@ -59,7 +59,7 @@ public class NavDrawer_SpendSummary extends AppCompatActivity {
 
         //**** To create csv file which will be used for algorithm in python*******
 
-        exportcsvbtn.setOnClickListener(new View.OnClickListener() {
+        /*exportcsvbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     try {
@@ -113,7 +113,7 @@ public class NavDrawer_SpendSummary extends AppCompatActivity {
                     }
 
             }
-        });
+        });*/
 
 
         //******To create Excel file of Sqlite db *******
