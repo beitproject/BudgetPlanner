@@ -591,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
             ///*****To create csv for algo input *****
             try {
                 File folder = Environment.getExternalStorageDirectory();
-                String fileName = folder.getPath() + "/MyExpenses.csv";
+                String fileName = folder.getPath() + "/dataset.csv";
                 File myFile = new File(fileName);
                 if (myFile.exists())
                     myFile.delete();
@@ -600,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
                 int rowcount = 0;
                 int colcount = 0;
                 File sdCardDir = Environment.getExternalStorageDirectory();
-                String filename = "MyExpenses.csv";  //the name of the file to export with
+                String filename = "dataset.csv";  //the name of the file to export with
                 File saveFile = new File(sdCardDir, filename);
                 FileWriter fw = new FileWriter(saveFile);
                 Cursor cursor_csv = dbhelper.getDaysData();
@@ -654,10 +654,10 @@ public class MainActivity extends AppCompatActivity {
             //create "uploads" folder to store file to be uploaded,in "FileUpload"
             //save upload.php file in "FileUpload" folder.
             int serverResponseCode = 0;
-            String uploadServerUri = "http://192.168.1.103/FileUpload/upload.php";
+            String uploadServerUri = "http://192.168.1.101/FileUpload/upload.php";
             //String uploadServerUri = "http://ServerSystemIpAddr(Pc IP)/FileUpload(Folder in htdocs/xampp )/upload.php";
             final String uploadFilePath = "/storage/emulated/0/";
-            final String uploadFileName = "MyExpenses.csv";
+            final String uploadFileName = "dataset.csv";
             String fileName = uploadFilePath+""+uploadFileName;
             HttpURLConnection conn = null;
             DataOutputStream dos = null;
@@ -683,12 +683,12 @@ public class MainActivity extends AppCompatActivity {
                 conn.setRequestProperty("Connection", "Keep-Alive");
                 conn.setRequestProperty("ENCTYPE", "multipart/form-data");
                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                conn.setRequestProperty("uploaded_file", fileName);
+                conn.setRequestProperty("file", fileName);
 
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=uploaded_file; filename="+fileName+""+lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=file; filename="+fileName+""+lineEnd);
 
                 dos.writeBytes(lineEnd);
 
