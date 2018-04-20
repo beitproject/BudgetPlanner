@@ -654,7 +654,7 @@ public class MainActivity extends AppCompatActivity {
             //create "uploads" folder to store file to be uploaded,in "FileUpload"
             //save upload.php file in "FileUpload" folder.
             int serverResponseCode = 0;
-            String uploadServerUri = "http://192.168.1.103/FileUpload/upload.php";
+            String uploadServerUri = "http://192.168.0.101/FileUpload/upload.php";
             //String uploadServerUri = "http://ServerSystemIpAddr(Pc IP)/FileUpload(Folder in htdocs/xampp )/upload.php";
             final String uploadFilePath = "/storage/emulated/0/";
             final String uploadFileName = "MyExpenses.csv";
